@@ -2,6 +2,8 @@
 
 设置一个 high 和一个 low, high 从上界开始减少, low 从下界开始增加, 取二者中间值 mid = low + (high - low) / 2 和目标比较, 注意边界条件: high >= low 使得high low 相等时也能访问到中间值, high = mid - 1 和 low = mid + 1 在 low = 0, high = 2, mid = 2时能跳出死循环 
 
+除了 mid 和目标相同时退出, 常用退出条件还有一个就是 low, 原因: 当 low = mid + 1 时, 搜索范围在 从右往左 缩小, high 作为 < low 的退出条件是会等于 mid , 所以选择 low (保底)
+
 Binary Search: https://leetcode.com/problems/binary-search/
 
 经典模板
@@ -156,3 +158,66 @@ Pow(x, n): https://leetcode.com/problems/powx-n/
  }
 ```
 
+# 经典隐藏上下界二分
+## 典中典: 可可吃香蕉
+Koko Eating Bananas: https://leetcode.com/problems/koko-eating-bananas/
+
+上界: 理论是 sum(nums) 但是铁越界, 所以直接用MAX_VALUE; 下界: 1
+
+check 方式: 看当前所需时间是否超过指定时间, 超过则说明慢了; 
+
+一直保持 valid 在 [mid + 1, high] 的空间, 则 lo = mid + 1, 返回 lo 即可
+
+```java
+public int minEatingSpeed(int[] nums, int h) {
+    int hi = Integer.MAX_VALUE, lo = 1;
+    while(hi > lo){
+        int mid = lo + (hi - lo) / 2;
+        int count = 0;
+        for(int num : nums) count += (int)Math.ceil(1.0 * num / mid);
+        
+        if(count > h){
+            lo = mid + 1;
+        }else{
+            hi = mid;
+        }
+    }
+    return lo;
+}
+```
+
+
+
+
+Split Array Largest Sum: https://leetcode.com/problems/split-array-largest-sum/
+
+上界: 数组和(m=1), 下界: 最大数组(m=n), high = 上界, low = 下界, 二分搜索可能值范围
+
+使用 mid 作为最大的 subarray sum, count subarray 的数量, 如果 count 小于 m , 则说明这个 mid 可以再小一点, 还有子数组个数的余韵; 如果 count 大于 m, 说明 mid 不够大, subarray 超出了指定的 m
+
+```java
+public int splitArray(int[] nums, int m) {
+    int hi = 0, lo = 0;
+    for(int num : nums){
+        hi += num;
+        lo = Math.max(lo, num);
+    }
+    
+    while(hi > lo){
+        int mid = lo + (hi - lo) / 2;
+        int total = 0, count = 1;
+        for(int num : nums){
+            if(total + num <= mid){
+                total += num;
+            }else{
+                total = num;
+                count += 1;
+            }
+        }
+        if(count > m){
+            lo = mid + 1;
+        }else   hi = mid;
+    }
+    return hi;
+}
+```
