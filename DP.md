@@ -187,6 +187,33 @@ public int climbStairs(int n) {
 }
 ```
 
+Decode Ways: https://leetcode.com/problems/decode-ways/
+
+条件复杂一些的 climbing stairs, 根据前两位判断作转移, dp[i] = dp[i-1] + dp[i-2]
+
+在当前数字为 0-9 , dp[i] += dp[i-1]; 当前两个数字为 10-26, dp[i] += dp[i-2]
+
+```java
+public int numDecodings(String s) {
+    char[] chars = s.toCharArray();
+    int[] dp = new int[chars.length + 1];
+    dp[0] = 1;
+    dp[1] = chars[0] == '0' ? 0 : 1;
+    for(int i = 2; i <= chars.length; i++){
+        int unitDigit = chars[i-1] - '0';
+        int tenDigit = chars[i-2] - '0';
+        if(unitDigit >= 1 && unitDigit <= 9){
+            dp[i] += dp[i-1];
+        }
+        int tens = 10 * tenDigit + unitDigit;
+        if(tens >= 10 && tens <= 26){
+            dp[i] += dp[i-2];
+        }
+    }
+    return dp[chars.length];
+}
+```
+
 Min Cost Climbing Stairs: https://leetcode.com/problems/min-cost-climbing-stairs/
 
 转移方程: $F[i] = min(F[i-1], F[i-2]) + cost[i]$

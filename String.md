@@ -165,7 +165,7 @@ public int myAtoi(String s) {
 
 Longest Common Prefix: https://leetcode.com/problems/longest-common-prefix/
 
-最长公共前缀 俩for
+最长公共前缀 最长的前缀不会超过最短的 String 长度, 俩for 检测即可
 
 ```java
 public String longestCommonPrefix(String[] strs) {
@@ -210,5 +210,32 @@ public long[] kthPalindrome(int[] queries, int intLength) {
         }
     }
     return res;
+}
+```
+
+Valid Palindrome II: https://leetcode.com/problems/valid-palindrome-ii/
+
+相比一般的palin 多了一层嵌套check就是了
+
+```java
+public boolean validPalindrome(String s) {
+    int lo = 0, hi = s.length() - 1;
+    while(hi > lo){
+        if(s.charAt(lo) == s.charAt(hi)){
+            lo++;
+            hi--;
+        }else{
+            return isPalin(s, lo + 1, hi) || isPalin(s, lo, hi - 1);
+        }
+    }
+    return true;
+}
+private boolean isPalin(String s, int start, int end){
+    int lo = start, hi = end;
+    while(hi>lo){
+        if(s.charAt(lo)!=s.charAt(hi))  return false;
+        hi--;   lo++;
+    }
+    return true;
 }
 ```
