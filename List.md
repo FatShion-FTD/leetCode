@@ -224,3 +224,24 @@ public Node copyRandomList(Node head) {
     return copyHead;
 }
 ```
+
+Swapping Nodes in a Linked List: https://leetcode.com/problems/swapping-nodes-in-a-linked-list/
+
+一个访问双端 k-th 的 One-pass trick: 在访问到 k-th node 的时候, 把 node2 设置为 head, 这样当 node 访问到结尾的时候, node2 刚好在 n-k th 的位置, 实现 One-pass
+
+```java
+public ListNode swapNodes(ListNode head, int k) {
+    ListNode swap1 = null, swap2 = null;
+    for(ListNode node = head; node != null; node = node.next){
+        swap2 = swap2 == null ? null : swap2.next;
+        if(--k==0){
+            swap1 = node;
+            swap2 = head;
+        }
+    }
+    int val = swap1.val;
+    swap1.val = swap2.val;
+    swap2.val = val;
+    return head;
+}
+```

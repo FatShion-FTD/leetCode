@@ -47,6 +47,24 @@ class UnionFind {
 }
 ```
 
-Number of Provinces: https://leetcode.com/problems/number-of-provinces/
+## Number of Provinces: https://leetcode.com/problems/number-of-provinces/
 
 经典例题, 直接连接使用 UF 即可
+
+
+## Redundant Connection: https://leetcode.com/problems/redundant-connection/
+
+isConnected函数的经典应用
+
+```java
+public int[] findRedundantConnection(int[][] edges) {
+    int n = edges.length;
+    UnionFind uf = new UnionFind(n+1);
+    for(int i = 0; i < n; i++){
+        int[] pair = edges[i];
+        if(uf.isConnected(pair[0], pair[1]))   return pair;
+        uf.union(pair[0], pair[1]);
+    }
+    return edges[n-1];
+}
+```
