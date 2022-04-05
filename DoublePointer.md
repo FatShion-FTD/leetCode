@@ -42,3 +42,38 @@ public void nextPermutation(int[] nums) {
     return;
 }
 ```
+
+Container With Most Water: https://leetcode.com/problems/container-with-most-water/
+
+最经典的双指针问题, 同时用 Greedy 办法解决: 前缀最大, 后缀最大 + 双指针移动; 前缀和后缀 计算到 当前位置的最大高度(从左到右 和 从右到左); 双指针, 哪个小了, 移动哪个
+
+```java
+public int maxArea(int[] height) {
+    int n = height.length;
+    int[] pre = new int[n];
+    int[] suf = new int[n];
+    int max = Integer.MIN_VALUE;
+    
+    for(int i = 0; i < n; i++){
+        pre[i] = Math.max(max, height[i]);
+        max = pre[i];
+    }
+    
+    max = Integer.MIN_VALUE;
+    for(int i = n- 1; i >= 0; i--){
+        suf[i] = Math.max(max, height[i]);
+        max = suf[i];
+    }
+    
+    int left = 0, right = n - 1, res = 0;
+    while(right > left){
+        res = Math.max(res, Math.min(pre[left], suf[right]) * (right - left));
+        if(pre[left] > suf[right]){
+            right--;
+        }else{
+            left++;
+        }
+    }
+    return res;
+}
+```
