@@ -68,3 +68,32 @@ public int[] findRedundantConnection(int[][] edges) {
     return edges[n-1];
 }
 ```
+
+Number of Islands: https://leetcode.com/problems/number-of-islands/
+
+经典例题, 同时包含了矩阵判断, 核心: 注意在 j > 0 且 i > 0 的时候, 上左判断同时进行, 先上后左, 进行有效联通
+
+```java
+public int numIslands(char[][] grid) {
+    int n = grid.length;
+    if(n == 0)  return 0;
+    int m = grid[0].length;
+    
+    UnionFind uf = new UnionFind(m * n);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            if(grid[i][j] == '0'){
+                uf.deCount();
+            }else{
+                if(i == 0){
+                    if(j > 0 && grid[i][j-1] == '1')    uf.union(j-1, j);
+                }else{
+                    if(grid[i-1][j] == '1')     uf.union(i*m+j, (i-1)*m+j);
+                    if(j > 0 && grid[i][j-1] == '1')    uf.union(i*m+j, i*m+j-1);
+                }
+            }
+        }
+    }
+    return uf.getCount();
+}
+```

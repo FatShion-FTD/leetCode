@@ -25,6 +25,31 @@ public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
 }
 ```
 
+Merge k Sorted Lists: https://leetcode.com/problems/merge-k-sorted-lists/
+
+核心三点: 使用 PQ 实现一个 ListNode.val 单增的 优先队列 + 利用 List 的 next 特性实现延迟访问 + dummyHead
+
+先声明一个单增PQ, 把所有 list 的头都放到 PQ 中, 每次都访问 PQ.poll, 把结果增加到 head 后, 如果该 node 依然有next 则新增到 PQ 直到所有 list 访问完毕
+
+```java
+public ListNode mergeKLists(ListNode[] lists) {
+    if(lists == null || lists.length == 0)  return null;
+    ListNode head = new ListNode();
+    ListNode dummyHead = head;
+    PriorityQueue<ListNode> pq = new PriorityQueue<>((ListNode o1, ListNode o2) -> (o1.val - o2.val));
+    for(ListNode listHead : lists){
+        if(listHead != null)    pq.offer(listHead);
+    }
+    while(!pq.isEmpty()){
+        head.next = pq.poll();
+        head = head.next;
+        if(head.next != null)   pq.offer(head.next);
+    }
+    return dummyHead.next;
+}
+```
+
+
 Linked List Cycle: https://leetcode.com/problems/linked-list-cycle/
 
 使用快慢双指针, 找cycle, 数学原理: $2x - looplength * cycles = x;$ for x = 慢指针路径, looplength = 环的长度, cycles = 任意圈数
