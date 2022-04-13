@@ -482,7 +482,7 @@ public int maxProfit(int[] prices) {
 
 Longest Increasing Subsequence: https://leetcode.com/problems/longest-increasing-subsequence/
 
-使用一维DP, 记录到 i 为止的单增子序列长度, 从0开始遍历end, 和之前所有的lastEnd相比, 如果当前值大于lastEnd的值, 则lastEnd的长度+1和当前最大值. 转移函数:
+使用一维DP, 记录到 i 为止的单增子序列长度, 从0开始遍历end, 和 end 之前所有的lastEnd相比, 来更新dp[end]; 如果当前值大于lastEnd的值, 则lastEnd的长度+1和当前最大值. 转移函数:
 
 dp[end] = max(dp[end], dp[lastEnd] + 1) if num[end] > num[lastEnd]
 

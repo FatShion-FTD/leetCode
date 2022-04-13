@@ -5,7 +5,12 @@
 
 对 bucket 排序后, 再逐个访问 每个桶 中的元素
 
+## 经典 Bucket Sort
+对一个数组进行排序, 思路: 1. 先创建10个桶, 代表着当前位数从 0-9 的桶.
 
+2. 从最低位数开始遍历直到最高位数: 对于每一位, 把 num 放入对应的 桶 中, 然后将所有数从 0桶 开始逐个 pop, 构建全新数组, 然后进入下一位的 sort 
+
+## Problems
 Top K Frequent Elements: https://leetcode.com/problems/top-k-frequent-elements/
 
 使用 bucket 装属于 出现次数 的值, 如 出现了100次的1 和 100次的2, 都放在 bucket[100] 中, 从装的最多的桶开始访问, 构建答案

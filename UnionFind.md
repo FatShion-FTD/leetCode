@@ -102,7 +102,7 @@ Smallest String With Swaps: https://leetcode.com/problems/smallest-string-with-s
 
 核心: UnionFind + 使用 MAP 搭配 PriorityQueue 实现根据 root 分类的自动排序 char 队列
 
-问题主要在于: 如何储存 联通分量 并 按照字典序排列, 连通分量使用 Map, key 是 root, value 是这个连通分量下所有的连通点, 字典序排列 使用 PriorityQueue 即可, 构建完毕即可 使用 get(find(i)).poll() 逐个访问
+问题主要在于: 如何储存 联通分量 并 按照字典序排列, 连通分量使用 Map, key 是 root, value 是这个连通分量下所有的连通点, 字典序排列 使用 PriorityQueue 即可, 构建完毕即可 使用 map.get(find(i)).poll() 逐个访问
 
 
 ```java

@@ -221,3 +221,28 @@ public int splitArray(int[] nums, int m) {
     return hi;
 }
 ```
+
+69. Sqrt(x): https://leetcode.com/problems/sqrtx/
+
+经典题目: 二分搜索, 但是trick: 因为返回 floor(sqrt) 的 int, 所以 
+x >= i * i && x < (i+1)(i+1). 并且 使用 i < x / i 避免越界
+
+```java
+public int mySqrt(int x) {
+    if(x == 0 || x == 1)  return x;
+    
+    int lo = 0, hi = x;
+    while(hi > lo){
+        int mid = lo + (hi-lo) / 2;
+        if(mid <= x / mid && (mid+1) > x / (mid+1)){
+            return mid;
+        }
+        if(mid > x / mid){
+            hi = mid;
+        }else{
+            lo = mid + 1;
+        }
+    }
+    return lo;
+}
+```
