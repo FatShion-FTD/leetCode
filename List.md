@@ -49,6 +49,51 @@ public ListNode mergeKLists(ListNode[] lists) {
 }
 ```
 
+HARD实现: 两点: 
+
+1. 使用 merge sort 的思想, 对 k 个list进行 split, 直到最后成为 两个list 为一组, 再归并返回. **注意**: 在 split 的时候, 如果抵达 one list 则 返回 list[left] 作为 recursion 的 base
+
+2. 复用之前的 merge2list 源代码
+
+```java
+public ListNode mergeKLists(ListNode[] lists) {
+    if(lists == null || lists.length == 0)  return null;
+    return mergeK(lists, 0, lists.length - 1);
+}
+
+private ListNode mergeK(ListNode[] lists, int left, int right){
+    if(right > left){
+        int mid = left + (right - left) / 2;
+        return mergeTwo(mergeK(lists, left, mid), mergeK(lists, mid+1, right));
+    }
+    return lists[left];
+}
+
+
+private ListNode mergeTwo(ListNode list1, ListNode list2){
+    ListNode head = new ListNode();
+    ListNode dummy = head;
+    while(list1 != null && list2 != null){
+        if(list1.val > list2.val){
+            head.next = list2;
+            head = head.next;
+            list2 = list2.next;
+        }else{
+            head.next = list1;
+            head = head.next;
+            list1 = list1.next;
+        }
+    }
+    if(list1 != null){
+        head.next = list1;
+    }
+    if(list2 != null){
+        head.next = list2;
+    }
+    return dummy.next;
+}
+```
+
 
 Linked List Cycle: https://leetcode.com/problems/linked-list-cycle/
 
