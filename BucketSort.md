@@ -41,3 +41,40 @@ public int[] topKFrequent(int[] nums, int k) {
     return res;
 }
 ```
+
+1874. Minimize Product Sum of Two Arrays: https://leetcode.com/problems/minimize-product-sum-of-two-arrays/
+
+简单的方法是使用PQ, 但是 桶排序在这道问题有奇效, 原因: num 的取值有特殊性: 0 - 100
+
+这意味着存在使用 桶排序 的可能, 空间复杂度 O(100) 够低, 只需要创建100个桶并把他们逐个放入, 最后 rebuild sorted array 即可
+
+```java
+public int minProductSum(int[] nums1, int[] nums2) {
+    int[] count1 = new int[101], count2 = new int[101];
+    for(int num : nums1)count1[num] += 1;
+    for(int num : nums2) count2[num] += 1;
+    
+    int p1 = 0, p2 = 100, i1 = 0, i2 = 0;
+    while(p1<=100 && p2 >= 0){
+        if(count1[p1] != 0){
+            while(count1[p1] > 0){
+                nums1[i1++] = p1;
+                count1[p1]--;
+            }
+        }
+        p1++;
+        if(count2[p2] != 0){
+            while(count2[p2] > 0){
+                nums2[i2++] = p2;
+                count2[p2]--;
+            }
+        }
+        p2--;
+    }
+    int res = 0;
+    for(int i = 0; i < nums1.length; i++){
+        res += nums2[i] * nums1[i];
+    }
+    return res;
+}
+```

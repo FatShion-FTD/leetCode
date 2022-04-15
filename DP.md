@@ -413,7 +413,7 @@ public int coinChange(int[] coins, int a) {
 
 Coin Change 2: https://leetcode.com/problems/coin-change-2/
 
-标准背包问题DP, DP记录的是到当前coin种类下各个价格时的组合数量, 使用DP记录使用上一种coin到各个价格时候的组合数, 在至少可以使用一种新coin的情况下, dp[j] += dp[j - coins[i]] 得到总价为 j 时, 使用新coin的组合数量. 对于重复使用问题, 如3+3=6时, dp[3] += dp[0], dp[6] += dp[3]解决
+标准背包问题DP, DP记录的是到当前coin种类下各个价格时的组合数量, 使用DP记录使用到上一种coin为止的各种coins, 到各个价格时候的组合数, 在至少可以使用一种新coin的情况下 (j=coins[i]), dp[j] += dp[j - coins[i]] 得到总价为 j 时, 使用新coin参与的组合数量. 对于重复使用问题, 如3+3=6时, dp[3] += dp[0], dp[6] += dp[3]解决
 
 ```java
 public int change(int amount, int[] coins) {
@@ -425,6 +425,39 @@ public int change(int amount, int[] coins) {
         }
     }
     return dp[amount];
+}
+```
+
+983. Minimum Cost For Tickets: https://leetcode.com/problems/minimum-cost-for-tickets/
+
+强化版 coin change, 依然使用 i 从 0 到 最大值的每个中间状态进行DP, 注意三点: 
+
+1. 最大值不再是days.length, 而是 max(days)
+2. 注意使用 set 保存所有有效日期, 对于无效日期, 继承上一时刻状态 dp[i] = dp[i-1], 只针对有效日期进行dp
+3. 转移内部注意 max(0, i-dur[j]), 确保所有有效日期都能访问dp[0], 不使用 if(i-dur[j] >= 0) 原因: 1,6,16 时, 确保能访问 7-days pass, 而不是跳过
+
+转移方程: dp[i] = Math.min(dp[i], dp[Math.max(0, i - dur[j])] + costs[j]);
+
+```java
+public int mincostTickets(int[] days, int[] costs) {
+    Set<Integer> set = new HashSet<>();
+    for(int day : days) set.add(day);
+    int n = days[days.length - 1];
+    int[] dp = new int[n+1];
+    int[] dur = new int[]{1,7,30};
+    Arrays.fill(dp, Integer.MAX_VALUE);
+    dp[0] = 0;
+    
+    for(int i = 1; i <= n; i++){    // 到第N天的最小cost
+        if(set.contains(i)){
+            for(int j = 0; j < dur.length; j++){
+                dp[i] = Math.min(dp[i], dp[Math.max(0, i - dur[j])] + costs[j]);
+            }
+        }else{
+            dp[i] = dp[i-1];
+        }
+    }
+    return dp[dp.length - 1];
 }
 ```
 
