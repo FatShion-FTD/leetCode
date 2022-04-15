@@ -270,3 +270,24 @@ public ListNode swapNodes(ListNode head, int k) {
     return head;
 }
 ```
+
+19. Remove Nth Node From End of List: https://leetcode.com/problems/remove-nth-node-from-end-of-list/
+
+和上面拿到题一样的思想, 但是注意使用 dummy before head 进行访问, 从而避免 n = 1 和 list.length = 1 时候的越界问题
+
+```java
+public ListNode removeNthFromEnd(ListNode head, int n) {        
+    ListNode dummy = new ListNode(), fast = dummy, slow = dummy;
+    dummy.next = head;
+    while(n>=0){
+        fast = fast.next; 
+        n--;
+    }
+    while(fast != null){
+        fast = fast.next;
+        slow = slow.next;
+    }
+    slow.next = slow.next.next;
+    return dummy.next;
+}
+```
