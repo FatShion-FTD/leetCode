@@ -3,6 +3,8 @@
 
 # Problems
 ## Traverse 总结
+### 不管对于 iteration 还是 recursion 实现, 都要意识到一点: 那就是在探索完毕后, 其实还有一个返回的过程, 我们对于 node 的访问, 除了 preOrder, 都应在返回的路上完成.对于 iteration, 返回过程是在 node == null 时; 对于recursion, 返回在每次递归调用之后.
+
 144. Binary Tree Preorder Traversal: https://leetcode.com/problems/binary-tree-preorder-traversal/
 
 前序访问, 迭代DFS实现: 左 中 右, 在所有左探的路上记录 val
@@ -14,7 +16,7 @@ public List<Integer> preorderTraversal(TreeNode root) {
     while(root != null || !stack.isEmpty()){
         if(root != null){
             stack.push(root);
-            res.add(root.val);
+            res.add(root.val);  // 左探路上记录
             root = root.left;   // 左
         }else{
             TreeNode node = stack.pop();    // 中
@@ -36,7 +38,7 @@ public List<Integer> inorderTraversal(TreeNode root) {
         if(root != null){
             stack.push(root);
             root = root.left;   // 左
-        }else{
+        }else{ 
             TreeNode node = stack.pop();    // 中
             res.add(root.val);
             root = node.right;   // 右
