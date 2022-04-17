@@ -24,3 +24,29 @@ public boolean reachingPoints(int sx, int sy, int tx, int ty) {
         sy == ty && tx >= sx && (tx - sx) % ty == 0;
 }
 ```
+
+2244. Minimum Rounds to Complete All Tasks: https://leetcode.com/problems/minimum-rounds-to-complete-all-tasks/
+
+## 原理: 每个数字 都是 由 N个 2 和 3 组成的, 除了 1
+
+如果 num 不能被 3 整除, 则 余数为1时, 取 3+1 = 4 -> 4 / 2 = 2; 余数为2时, 直接 +1. 则不能被 3 整除时, 直接 总数 +1 即可
+
+```java
+public int minimumRounds(int[] tasks) {
+  Map<Integer, Integer> map = new HashMap<>();
+  for(int num : tasks){
+      map.put(num, map.getOrDefault(num, 0) + 1);
+  }
+  int count = 0;
+  for(Map.Entry<Integer, Integer> entry : map.entrySet()){
+      int total = entry.getValue();
+      if(total == 1)  return -1;
+      if(total % 3 == 0){
+          count += total / 3;
+      }else{
+          count += (total / 3) + 1;
+      }
+  }
+  return count;
+}
+```

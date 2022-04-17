@@ -239,3 +239,27 @@ private boolean isPalin(String s, int start, int end){
     return true;
 }
 ```
+2243. Calculate Digit Sum of a String: https://leetcode.com/problems/calculate-digit-sum-of-a-string/
+
+简单迭代, 每次访问 k 个元素, 加入新的 StringBuilder 即可
+
+```java
+public String digitSum(String s, int k) {
+    StringBuilder sb = new StringBuilder(s);
+    while(sb.length() > k){
+        int i = 0;
+        StringBuilder temp = new StringBuilder();
+        char[] chars = sb.toString().toCharArray();
+        while(i<sb.length()){
+            int start = i, sum = 0;
+            i = Math.min(chars.length, i+k);
+            for(int j = start; j < i; j++){
+                sum += chars[j] - '0';
+            }
+            temp.append(sum);
+        }
+        sb = temp;
+    }
+    return sb.toString();
+}
+```

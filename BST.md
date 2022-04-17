@@ -105,6 +105,48 @@ public TreeNode convertBST(TreeNode root) {
    return root;
 }
 ```
+897. Increasing Order Search Tree: https://leetcode.com/problems/increasing-order-search-tree/
+
+两种解法: iteration 实现: 使用 stack 进行 inorder traverse + Dummmy Head 重构. 切记不可直接使用使用in-place, 不然会出现提前剪枝
+
+相对来说, 这道题的iteration更加好想
+
+```java
+public TreeNode increasingBST(TreeNode root) {
+   if(root == null)    return null;
+   TreeNode newHead = new TreeNode();
+   TreeNode prev = newHead;
+   Deque<TreeNode> stack = new ArrayDeque<>();
+   while(!stack.isEmpty() || root != null){
+       if(root != null){
+           stack.push(root);
+           root = root.left;
+       }else{
+           root = stack.pop();
+           prev.right = root;
+           prev = prev.right;
+           root.left = null;
+           root = root.right;
+       }
+   }
+   return newHead.right;
+}
+```
+递归实现: 传入两个参数, 当前 node 和 inorder 下的 next node. 在node本身为空时, 抵达base, 返回 next(其 parent); 访问 node.left 时, 递归的 next 是当前 node; left 置空; 对于比自己大的 node.right, 放入 right, 递归的next 还是 next;
+
+```java
+public TreeNode increasingBST(TreeNode root) {
+   return  increasingBST(root, null);
+}
+
+public TreeNode increasingBST(TreeNode root, TreeNode next){
+   if(root == null)    return next;
+   TreeNode res = increasingBST(root.left, root);
+   root.left = null;
+   root.right = increasingBST(root.right, next);
+   return res;
+} 
+```
 
 
 700. Search in a Binary Search Tree: https://leetcode.com/problems/search-in-a-binary-search-tree/
