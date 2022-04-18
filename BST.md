@@ -171,6 +171,47 @@ public TreeNode searchBST(TreeNode root, int val) {
     return null;
 }
 ```
+
+230. Kth Smallest Element in a BST: https://leetcode.com/problems/kth-smallest-element-in-a-bst/
+
+标准 in-order, 查找第N个
+
+```java
+public int kthSmallest(TreeNode root, int k) {
+   Deque<TreeNode> stack = new ArrayDeque<>();
+   while(!stack.isEmpty() || root != null){
+       if(root != null){
+           stack.push(root);
+           root = root.left;
+       }else{
+           root = stack.pop();
+           if(k-- == 1)    return root.val;
+           root = root.right;
+       }
+   }
+   return -1;
+}
+```
+
+使用 Binary Search的办法: 记录 左子树的node数量, 如果 左子树数量 == k 则返回; 如果左子树数量 > k, 则进入左子树; 如果 < k, 则进入 右子树, k = k - 左子树数量 - 1 (当前node)
+```java
+public int kthSmallest(TreeNode root, int k) {
+   int mid = countNode(root.left);
+   if( k <= mid){
+       return kthSmallest(root.left, k);
+   }else if(k > mid + 1){
+       return kthSmallest(root.right, k-1-mid);
+   }
+   return root.val;
+}
+
+private int countNode(TreeNode node){
+   if(node == null)    return 0;
+   return 1 + countNode(node.left) + countNode(node.right);
+}
+```
+
+
 669. Trim a Binary Search Tree: https://leetcode.com/problems/trim-a-binary-search-tree/
 
 标准递归, 要修枝时: 直接将 root 作为返回的节点, 然后递归搜索有效范围
