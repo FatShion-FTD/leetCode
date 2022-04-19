@@ -81,6 +81,37 @@ private void traversalHelper(TreeNode root){
 }
 ```
 
+超高级实现 Morris, 不使用 stack 和 recursion, O(1) space
+![https://images0.cnblogs.com/blog/300640/201306/14214057-7cc645706e7741e3b5ed62b320000354.jpg](https://images0.cnblogs.com/blog/300640/201306/14214057-7cc645706e7741e3b5ed62b320000354.jpg)
+```java
+void MorrisTraversal(Node root)
+{
+   Node current, pre;
+   if (root == null)    return;
+   current = root;
+   while (current != null) {
+       if (current.left == null) {  // current 此时为最小值(左下), 中
+           System.out.print(current.data + " ");    
+           current = current.right; // current 走 右子树
+       } else {
+           pre = current.left;  // 找值仅次于 current.val 的前一 node 
+           while (pre.right != null && pre.right != current)
+               pre = pre.right;
+       // 前一节点的右节点 为空, 则把 前一节点 和 当前节点 构建返回的链接, 图中虚线
+           if (pre.right == null) {
+               pre.right = current;
+               current = current.left;
+           } else { 
+     // 前一节点的右节点 就是 当前节点, 说明抵达 当前子树最右 brach, 向右下遍历
+               pre.right = null;
+               System.out.print(current.data + " ");
+               current = current.right;
+           } /* End of if condition pre->right == NULL*/
+       } /* End of if condition current->left == NULL*/
+   } /* End of while */
+}
+```
+
 538. Convert BST to Greater Tree: https://leetcode.com/problems/convert-bst-to-greater-tree/
 
 使用 postOrder 进行访问, 并记录suffix, 返回的路上 node.val += suffix 即可
@@ -260,5 +291,44 @@ public TreeNode trimBST(TreeNode root, int low, int high) {
        dummy = dummy.right;
    }
    return root;
+}
+```
+99. Recover Binary Search Tree: https://leetcode.com/problems/recover-binary-search-tree/
+
+交换由两种情况: 
+1. 邻接, 1,2,4,3,5, 这种情况下直接 3 和 4 左右互换即可;
+2. 非邻接, 1,2,5,4,3, 这种情况下, 需要记录 第一组 pair 5 和 4, 以及第二组 pair 4 和 3, 交换 5 和 3;
+
+使用 list 保存这些错误pair, 如果 list length == 1, 则说明邻接, 互换; 如果非邻接, 则 让 last pair 的 small value 和 first pair 的 large value 互换
+
+
+```java
+public void recoverTree(TreeNode root) {
+   Deque<TreeNode> stack = new ArrayDeque<>();
+   TreeNode prev = new TreeNode(Integer.MIN_VALUE);
+   List<TreeNode[]> list = new ArrayList<>();
+   while(root!=null || !stack.isEmpty()){
+       if(root != null){
+           stack.push(root);
+           root = root.left;
+       }else{
+           root = stack.pop();
+           if(root.val < prev.val){
+               list.add(new TreeNode[]{prev, root});
+           }
+           prev = root;
+           root = root.right;
+       }
+   }
+   if(list.size() == 1){
+       int temp = list.get(0)[0].val;   // largest value in pairs
+       list.get(0)[0].val = list.get(0)[1].val;
+       list.get(0)[1].val = temp;
+   }else{
+       int temp = list.get(0)[0].val;
+       list.get(0)[0].val = list.get(1)[1].val; // smallest
+       list.get(1)[1].val = temp;
+   }
+   return;
 }
 ```
