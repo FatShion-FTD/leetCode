@@ -1,5 +1,129 @@
 # 数据结构
-## 栈
+# HashSet 实现
+
+hash set 好复杂啊, 复制的, 看不懂
+
+```java
+class MyHashSet {
+    List<Integer>[] container = null;
+    int cap = 1000;
+    double loadFactor = 0.75;
+    int count = 0; 
+    /** Initialize your data structure here. */
+    public MyHashSet() {
+        container = new LinkedList[cap];
+    }
+    
+    public void add(int key) {
+        if(contains(key)) return;
+        if(loadFactor*cap == count){
+            count = 0;
+            //rehash
+            cap *= 2;
+            List<Integer>[] oldC = container;
+            container = new LinkedList[cap];
+            for(int i=0; i < oldC.length; i++){
+                List<Integer> list = oldC[i];
+                if(list != null){
+                    for(int entry : list)
+                       this.add(entry); 
+                }
+            }
+        }
+        int hash = key % cap;
+        if(container[hash] == null)
+            container[hash] = new LinkedList<>();
+        container[hash].add(key);
+        ++count;
+    }
+    
+    public void remove(int key) {
+        int hash = key % cap;
+        List<Integer> list = container[hash];
+        if(list != null){
+            Iterator<Integer> itr = list.iterator();
+            while(itr.hasNext())
+                if(itr.next() == key){
+                    itr.remove();
+                    --count;
+					break;
+                }
+        }
+    }
+    
+    /** Returns true if this set contains the specified element */
+    public boolean contains(int key) {
+        int hash = key % cap;
+        List<Integer> list = container[hash];
+        if(list != null){
+            Iterator<Integer> itr = list.iterator();
+            while(itr.hasNext())
+                if(itr.next() == key)
+                    return true;
+        }
+        return false;
+    }
+}
+```
+
+## HashTable 实现
+
+使用 Node 进行 hashtable 实现, Node 实际是 Map.Entry. 使用 Integer.hashCode 直接获取 hash code, 然后对 node.length 取模
+
+```java
+class MyHashMap {
+
+        final ListNode[] nodes = new ListNode[10_000];
+
+        public void put(int key, int value){
+            int i = idx(key);
+            if(nodes[i] == null)
+                nodes[i] = new ListNode(-1, -1);
+            ListNode prev = find(nodes[i], key);
+            if(prev.next == null)
+                prev.next = new ListNode(key, value);
+            else prev.next.val = value;
+        }
+
+        public int get(int key){
+            int i = idx(key);
+            if(nodes[i] == null)
+                return -1;
+            ListNode node = find(nodes[i], key);
+            return node.next == null ? -1 : node.next.val;
+        }
+
+        public void remove(int key){
+            int i = idx(key);
+            if(nodes[i] != null){
+                ListNode prev = find(nodes[i], key);
+                if(prev.next != null)
+                    prev.next = prev.next.next;
+            }
+        }
+
+        int idx(int key){return Integer.hashCode(key) % nodes.length;}
+
+        ListNode find(ListNode bucket, int key){
+            ListNode node = bucket, prev = null;
+            for(; node != null && node.key != key; node = node.next)
+                prev = node;
+            return prev;
+        }
+
+        class ListNode{
+            int key, val;
+            ListNode next;
+
+            ListNode(int key, int val){
+                this.key = key;
+                this.val = val;
+            }
+        }
+}
+```
+
+# 栈
 Design a Stack With Increment Operation: https://leetcode.com/problems/design-a-stack-with-increment-operation/
 
 客制化stack, 核心: **前缀和**, 使用 inc 数组维护一个**数据改变的操作**序列 而不是单纯的数字:
@@ -265,4 +389,42 @@ Rotate Image: https://leetcode.com/problems/rotate-image/
      }
      return;
  }
+```
+
+
+# 系统设计
+系统设计类型的题目, 考察 data struture 的应用 和 优化
+
+
+1396. Design Underground System: https://leetcode.com/problems/design-underground-system/
+
+核心 2 点:
+1. 使用 2 个Map, 一个 用 route 作为 key, total time 和 count 对作为 value; 一个用 userId 作为 key, checkInStation 和 checkInTime 对作为value.
+2. 使用 Pair 数据类型, 和 Map.Entry 有类似函数, 存储 key 和 value, 使用 Pair 存相应的对
+
+```java
+class UndergroundSystem {
+    Map<String, Pair<Integer, Integer>> checkOutMap = new HashMap<>();  // route- {time, count}
+    Map<Integer, Pair<String, Integer>> checkInMap = new HashMap<>();   // Uid - {startStation, checkInTime}
+    
+    public UndergroundSystem() {}
+    
+    public void checkIn(int id, String stationName, int t) {
+        checkInMap.put(id, new Pair<>(stationName, t));
+    }
+    
+    public void checkOut(int id, String stationName, int t) {
+        Pair<String, Integer> pair = checkInMap.get(id);
+        String route = pair.getKey() + "_" + stationName;
+        int time = t - pair.getValue();
+        Pair<Integer, Integer> checkOut = checkOutMap.getOrDefault(route, new Pair<>(0,0));
+        checkOutMap.put(route, new Pair<>(checkOut.getKey() + time, checkOut.getValue() + 1));
+    }
+    
+    public double getAverageTime(String startStation, String endStation) {
+        String route = startStation + "_" + endStation;
+        Pair<Integer, Integer> checkOut = checkOutMap.get(route);
+        return (double) checkOut.getKey() / checkOut.getValue();
+    }
+}
 ```
