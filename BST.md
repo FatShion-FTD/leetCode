@@ -332,3 +332,105 @@ public void recoverTree(TreeNode root) {
    return;
 }
 ```
+105. Construct Binary Tree from Preorder and Inorder Traversal: https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
+
+构造二叉树, 3点: 
+1. 使用 递归 办法找根节点
+
+```java
+ public TreeNode buildTree(int[] preorder, int[] inorder) {
+     return buildTree(0,inorder.length - 1,0, preorder, inorder);
+ }
+ 
+ private TreeNode buildTree(int inStart, int inEnd, int preStart, int[] preorder, int[] inorder){
+     if(preStart > preorder.length - 1 || inStart > inEnd){
+         return null;
+     }
+     TreeNode root = new TreeNode(preorder[preStart]);
+     int inIndex = 0;
+     for(int i = inStart; i <= inEnd; i++){
+         if(inorder[i] == root.val)  inIndex = i;
+     }
+     root.left = buildTree(inStart, inIndex - 1, preStart + 1, preorder, inorder);
+     root.right = buildTree(inIndex + 1, inEnd, preStart + inIndex - inStart + 1, preorder, inorder);
+     return root;
+ }
+```
+
+173. Binary Search Tree Iterator: https://leetcode.com/problems/binary-search-tree-iterator/
+
+二叉树迭代器, 使用 stack 实现迭代访问即可, 每次访问栈顶, 并把 node.right 作为 root, 所有左节点压入
+
+```java
+class BSTIterator {
+    Deque<TreeNode> stack;
+
+    public BSTIterator(TreeNode root) {
+        this.stack = new ArrayDeque<>();
+        while(root != null){
+            stack.push(root);
+            root = root.left;
+        }
+    }
+    
+    public int next() {
+        TreeNode curr = stack.pop();
+        TreeNode right = curr.right;
+        while(right != null){
+            stack.push(right);
+            right = right.left;
+        }
+        return curr.val;
+    }
+    
+    public boolean hasNext() {
+        return !stack.isEmpty();
+    }
+}
+```
+1586. Binary Search Tree Iterator II: https://leetcode.com/problems/binary-search-tree-iterator-ii/
+
+新增操作 prev, 增加一个存 prev 的stack 和 记录visited 的 set, 保证每个node 在 next 中的右子树只新增一次
+
+```java
+class BSTIterator {
+    Deque<TreeNode> stack = new ArrayDeque<>();
+    Deque<TreeNode> back = new ArrayDeque<>();
+    Set<TreeNode> visited = new HashSet<>();
+
+    public BSTIterator(TreeNode root) {
+        addAllLeft(root);
+    }
+    
+    public boolean hasNext() {
+        return !stack.isEmpty();
+    }
+    
+    public int next() {
+        TreeNode curr = stack.pop();
+        if(!visited.contains(curr) && curr.right != null){
+            addAllLeft(curr.right);
+        }
+        back.push(curr);
+        visited.add(curr);
+        return curr.val;
+    }
+    
+    public boolean hasPrev() {
+        return !back.isEmpty() && back.size() > 1;
+    }
+    
+    public int prev() {
+        TreeNode curr = back.pop();
+        stack.push(curr);
+        return back.peek().val;
+    }
+    
+    public void addAllLeft(TreeNode node){
+        while(node != null){
+            stack.push(node);
+            node = node.left;
+        }
+    }
+}
+```

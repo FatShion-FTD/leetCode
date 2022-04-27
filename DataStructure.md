@@ -428,3 +428,36 @@ class UndergroundSystem {
     }
 }
 ```
+
+# Iterator 迭代器
+迭代器的实现: 使用一个 Integer 记录上一时刻的Num即可
+```java
+class PeekingIterator implements Iterator<Integer> {
+    Iterator<Integer> iterator;
+    Integer peekNum;
+	public PeekingIterator(Iterator<Integer> iterator) {
+	    // initialize any member here.
+	    this.iterator = iterator;
+        this.peekNum = this.iterator.next();
+	}
+	
+    // Returns the next element in the iteration without advancing the iterator.
+	public Integer peek() {
+        return peekNum;
+	}
+	
+	// hasNext() and next() should behave the same as in the Iterator interface.
+	// Override them if needed.
+	@Override
+	public Integer next() {
+        int old = peekNum;
+        peekNum = iterator.hasNext() ? iterator.next() : null;
+	    return old;
+	}
+	
+	@Override
+	public boolean hasNext() {
+	    return peekNum != null;
+	}
+}
+```
