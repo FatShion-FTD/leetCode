@@ -126,3 +126,36 @@ public String smallestStringWithSwaps(String s, List<List<Integer>> pairs) {
     return sb.toString();
 }
 ```
+1631. Path With Minimum Effort: https://leetcode.com/problems/path-with-minimum-effort/
+
+二分查找+连通问题, 和coco banana类似, 使用 UnionFind 作为判断二分的标准
+
+
+```java
+public int minimumEffortPath(int[][] heights) {
+    int low = 0, high = 1000001;
+    while(high > low){
+        int mid = low + (high - low) / 2;
+        if(connect(mid, heights)){
+            high = mid;
+        }else{
+            low = mid + 1;
+        } 
+    }
+    return low;
+}
+
+private boolean connect(int thold, int[][] heights){
+    int n = heights.length;
+    int m = heights[0].length;
+    UnionFind uf = new UnionFind(n*m);
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            int curr = heights[i][j];
+            if(j+1< m && Math.abs(curr - heights[i][j+1]) <= thold) uf.union(i*m+j, i*m + j+1); // right
+            if(i+1< n && Math.abs(curr - heights[i+1][j]) <= thold) uf.union(i*m+j, (i+1)*m + j); // bottom
+        }
+    }
+    return uf.connected(0, n*m-1);
+}
+```
