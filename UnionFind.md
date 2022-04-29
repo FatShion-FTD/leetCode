@@ -159,3 +159,25 @@ private boolean connect(int thold, int[][] heights){
     return uf.connected(0, n*m-1);
 }
 ```
+785. Is Graph Bipartite?: https://leetcode.com/problems/is-graph-bipartite/
+
+Bipartite的核心: 两个graph子集, 内部没有连通.
+
+使用UnionFind, 遍历 每个node 并查找其 parent(检查是否与别的分量连通), 遍历其 子分量, 将所有子分量进行连通, 如果和子分量有连通则 不行.
+
+原因: 每次访问一个子graph, 相当于把 当前 node 和 其子连通分量 当作两个 set, 这两个绝对不能有重合. 而使用 find 可以保证哪怕在非当次连通的时刻, 也能保证其和子分量的重合会被打找到
+
+```java
+public boolean isBipartite(int[][] graph) {
+  int n = graph.length;
+  UnionFind uf = new UnionFind(n);
+  for(int i = 0; i < n; i++){
+      int part = uf.find(i);  
+      for(int j : graph[i]){
+          if(uf.find(j) == part)   return false;
+          uf.union(graph[i][0], j);   
+      }
+  }
+  return true;
+}
+```
