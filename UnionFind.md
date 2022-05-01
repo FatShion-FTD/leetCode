@@ -181,3 +181,49 @@ public boolean isBipartite(int[][] graph) {
   return true;
 }
 ```
+399. Evaluate Division: https://leetcode.com/problems/evaluate-division/
+
+究极复杂, String型 + 带值 UnionFind: 使用 Map 记录UnionFind的 String Pair, 使用 Map 记录每个 变量除以其父变量 对应的值 
+
+```java
+class Solution {
+    Map<String, String> p = new HashMap();  // UnionFind 的 p, <x, px>
+    Map<String, Double> vals = new HashMap();   // 每个union的对应值, <x, val - x->px>
+    public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+        // unionfind check connected, undirected graph
+        double[] res = new double[queries.size()];
+        for(int i = 0; i < values.length; i++){
+            union(equations.get(i).get(0), equations.get(i).get(1), values[i]);
+        }
+        for(int i = 0; i < queries.size(); i++){
+            String x = queries.get(i).get(0), y = queries.get(i).get(1);
+            res[i] = (p.containsKey(x) && p.containsKey(y) && find(x) == find(y)) ? vals.get(x) / vals.get(y): -1.0;
+        }
+        return res;
+    }
+    
+    public void union(String x, String y, double v){
+        add(x);
+        add(y);
+        String px = find(x), py = find(y);
+        p.put(px, py);
+        vals.put(px, v * vals.get(y)/ vals.get(x));
+    }
+    
+    public String find(String x){
+        String px = p.getOrDefault(x, x);
+        if(px != x){    // 如果 x != px
+            String pp = find(px);
+            vals.put(x, vals.get(x) * vals.get(px));    
+            p.put(x, pp);
+        }
+        return p.getOrDefault(x, x);
+    }
+    
+    public void add(String x){
+        if(p.containsKey(x))    return;
+        p.put(x, x);    // p[x] = x
+        vals.put(x, 1.0);   // v[x] = 1
+    }
+}
+```
