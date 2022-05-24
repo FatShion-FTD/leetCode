@@ -411,6 +411,8 @@ public int coinChange(int[] coins, int a) {
 }
 ```
 
+## 背包问题主要思路: 遍历每个物品, 在能装下物品的前提下(常使用反向遍历), 进行状态转移(dp[i] = max(dp[i], 1+dp[i-k]))
+
 Coin Change 2: https://leetcode.com/problems/coin-change-2/
 
 标准背包问题DP, DP记录的是到当前coin种类下各个价格时的组合数量, 使用DP记录使用到上一种coin为止的各种coins, 到各个价格时候的组合数, 在至少可以使用一种新coin的情况下 (j=coins[i]), dp[j] += dp[j - coins[i]] 得到总价为 j 时, 使用新coin参与的组合数量. 对于重复使用问题, 如3+3=6时, dp[3] += dp[0], dp[6] += dp[3]解决
@@ -425,6 +427,41 @@ public int change(int amount, int[] coins) {
         }
     }
     return dp[amount];
+}
+```
+
+474. Ones and Zeroes: https://leetcode.com/problems/ones-and-zeroes/
+
+背包问题带提前优化, 长度短的优先使用, 构建pairs储存基本信息, 使用背包思想DP
+
+遍历每个物品, 在能装下的前提下, 如: for(int j = m; j >= pair[0]; j--) 和 for(int k = n; k >= pair[1]; k--), 转移方程:
+
+dp[j][k] = Math.max(dp[j][k], 1 + dp[j - pair[0]][k - pair[1]]);
+```java
+public int findMaxForm(String[] strs, int m, int n) {
+    // preparation
+    int[][] pairs = new int[strs.length][2];
+    Arrays.sort(strs, (s1, s2) -> s2.length() - s1.length());
+    for(int i = 0; i < strs.length; i++){
+        String s = strs[i];
+        int oneS = 0, zeroS = 0;
+        for(int j = 0; j < s.length(); j++){
+            if(s.charAt(j) == '1') oneS += 1; else zeroS += 1;
+        }
+        pairs[i][0] = zeroS; pairs[i][1] = oneS;
+    }
+    // memo
+    int[][] dp = new int[m+1][n+1];
+    // DP
+    for(int i = 0; i < pairs.length; i++){
+        int[] pair = pairs[i];
+        for(int j = m; j >= pair[0]; j--){
+            for(int k = n; k >= pair[1]; k--){
+                dp[j][k] = Math.max(dp[j][k], 1 + dp[j - pair[0]][k - pair[1]]);
+            }
+        }
+    }
+    return dp[m][n];
 }
 ```
 
