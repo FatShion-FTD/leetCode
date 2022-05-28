@@ -132,6 +132,33 @@ public boolean searchMatrix(int[][] matrix, int target) {
 }
 ```
 
+300. Longest Increasing Subsequence: https://leetcode.com/problems/longest-increasing-subsequence/
+
+使用一个tail记录子序列 index 为 i, 长度为 i 时的最小末尾值, 使用二分搜索找到第一个大于 nums[curr] 的, 更新该子序列末尾值, 最后返回tail的长度即可 
+
+```java
+public int lengthOfLIS(int[] nums) {
+    int n = nums.length;
+    int[] dp = new int[n];
+    int size = 0;
+    
+    for(int i = 0; i < nums.length; i++){
+        int left = 0, right = size;
+        // 在dp中找到第一个比nums[i]大的
+        while(right!=left){
+            int mid = left + (right - left) / 2;
+            if(dp[mid] < nums[i]){  // dp[mid] 
+                left = mid + 1;
+            }else{
+                right = mid;
+            }
+        }
+        dp[left] = nums[i];
+        if(left == size) size++;
+    }
+    return size;
+}
+```
 
 
 # 基础计算

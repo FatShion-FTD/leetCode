@@ -2,6 +2,43 @@
 ## 前两北的HARD是背都要被下来的!!
 ### 25. Reverse Nodes in k-Group: https://leetcode.com/problems/reverse-nodes-in-k-group/
 
+10. Regular Expression Matching: https://leetcode.com/problems/regular-expression-matching/
+
+动态规划, 
+
+```java
+public boolean isMatch(String s, String p) {
+    if(s==null || p==null)  return false;
+    int m = s.length();
+    int n = p.length();
+    boolean[][] dp = new boolean[m+1][n+1];
+    dp[0][0] = true;
+    // base: s 为空, 能match的pattern, (?*)*, *可以把前一个带走, 如 "a*" = ""
+    for(int i = 0; i < n; i++){
+        if(p.charAt(i) == '*' && dp[0][i-1]){
+            dp[0][i+1] = true;   
+        }
+    }
+    // induction rule: 直接继承: s.charAt(i) == p.charAt(j) || p.charAt(j) == '.'
+    // dp[i+1][j] 意味 *为空, 继承上一j, 如 ab* ab; dp[i][j+1]意味 *有重复出现, 如 ab*, abb
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
+            // ???a(i) - ?a(j)      || ???a(i) - ?.(j)
+            if(s.charAt(i) == p.charAt(j) || p.charAt(j) == '.'){
+                dp[i+1][j+1] = dp[i][j];
+            }else if(p.charAt(j) == '*'){
+                if(p.charAt(j-1) != '.' && p.charAt(j-1) != s.charAt(i)){ // s: ??a p: ?b*, 这时 b* = '', 继承 j-2
+                    dp[i+1][j+1] = dp[i+1][j-1];
+                }else{  // j-1 表示 *把上一位带走了: a* = ''; j 表示 * 为空: a* = a; j+1 表示 * 继承了 s 的上一个: ??a  ?a*, p 后移一位, s指针没动
+                    dp[i+1][j+1] = (dp[i+1][j-1] || dp[i+1][j] || dp[i][j+1]);
+                }
+            }
+        }
+    }
+    return dp[m][n];
+}
+```
+
 分为K组的反转链表, 基础版: 分组, 重建, 处理特殊, O(n), O(n)
 ```java
 public ListNode reverseKGroup(ListNode head, int k) {
@@ -126,5 +163,72 @@ public int longestValidParentheses(String s) {
         res = Math.max(left, res);
     }
     return res;
+}
+```
+
+354. Russian Doll Envelopes: https://leetcode.com/problems/russian-doll-envelopes/
+
+先排序(1-2增, 2-1减), 后最长单增子序列
+
+```java
+ public int maxEnvelopes(int[][] envelopes) {
+     if(envelopes.length == 0)   return 0;
+     
+     Arrays.sort(envelopes, new Comparator<int[]>(){
+         @Override
+         public int compare(int[] o1, int[] o2){
+             if(o1[0] == o2[0])  return o2[1] - o1[1];
+             return o1[0] - o2[0];
+         }
+     });
+     
+     int[] heights = new int[envelopes.length];
+     for(int i = 0; i < envelopes.length; i++)   heights[i] = envelopes[i][1];
+     return lengthOfLIS(heights);
+ }
+ 
+ public int lengthOfLIS(int[] nums){
+     int n = nums.length;
+     int[] tail = new int[n];
+     int size = 0;
+     for(int num : nums){
+         int left = 0, right = size;
+         while(right > left){
+             int mid = left + (right - left) /2;
+             if(tail[mid] < num){
+                 left = mid + 1;
+             }else{
+                 right = mid;
+             }
+         }
+         tail[left] = num;
+         if(left == size) size++;
+     }
+     return size;
+ }
+```
+
+1996. The Number of Weak Characters in the Game: https://leetcode.com/problems/the-number-of-weak-characters-in-the-game/submissions/
+
+上述类似问题, 但是更加trick, 0位单减, 1位单增, 形成Atk从大到小, Def在同Atk下从小到大, 在确保Atk单减的前提下, 则i+1和i一定存在 [i][0] >= [i+1][0]的关系, 保存最大的Def, 如果小于最大Def即weak, 同Atk单增, 确保edge case 如: [1, 4] 和 [1, 10] 
+
+```java
+public int numberOfWeakCharacters(int[][] properties) {
+  if(properties.length == 0)  return 0;
+  
+  // sort in descending Atk and ascending Def 
+  Arrays.sort(properties, new Comparator<int[]>(){
+      @Override
+      public int compare(int[] o1, int[] o2){
+          if(o1[0] == o2[0])  return o1[1] - o2[1];
+          return o2[0] - o1[0];
+      }
+  });
+  int max = Integer.MIN_VALUE, res = 0;
+  for(int i = 0; i < properties.length; i++){
+      if(properties[i][1] < max)  res++;
+      max = Math.max(max, properties[i][1]);
+  }
+  return res;
 }
 ```

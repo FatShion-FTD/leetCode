@@ -16,3 +16,16 @@ public int singleNumber(int[] nums) {
     return res;
 }
 ```
+268. Missing Number: https://leetcode.com/problems/missing-number/
+
+使用XOR遍历 [0,n] 和nums, 则退化为 single number
+
+```java
+public int missingNumber(int[] nums) {
+    int res = 0;
+    for(int i = 0; i < nums.length; i++){
+        res ^= i ^ nums[i];
+    }
+    return res^nums.length;
+}
+```

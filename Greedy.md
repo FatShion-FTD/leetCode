@@ -131,3 +131,28 @@ Two City Scheduling: https://leetcode.com/problems/two-city-scheduling/
  }
 ```
 
+277. Find the Celebrity: https://leetcode.com/problems/find-the-celebrity/
+
+使用栈实现带有排除的两两比较, stack储存不认识别的人, 每次取出栈顶的两个元素, 看看他俩是否互相认识, 非 celebrity 必须认识 celebrity, 则每次都能去掉一个
+
+```java
+ public int findCelebrity(int n) {
+     Deque<Integer> stack = new ArrayDeque<>();
+     for(int i = 0; i < n; i++)  stack.push(i);
+     while(stack.size()>1){
+         int a = stack.pop();
+         int b = stack.pop();
+         if(knows(a,b)){
+             stack.push(b);
+         }else{
+             stack.push(a);
+         }
+     }
+     int candidate = stack.pop();
+     for(int i = 0; i < n; i++){
+         // 当i不为candidate时, candidate有不认识的人 或 有人不认识candidate则退出
+         if(i!= candidate && (knows(candidate, i) || !knows(i, candidate)))   return -1;
+     }
+     return candidate;
+ }
+```
