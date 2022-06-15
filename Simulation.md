@@ -81,3 +81,33 @@ public int[][] generateMatrix(int n) {
    return m;
 }
 ```
+
+## 43. Multiply Strings
+https://leetcode.com/problems/multiply-strings/
+
+![https://drscdn.500px.org/photo/130178585/m%3D2048/300d71f784f679d5e70fadda8ad7d68f](https://drscdn.500px.org/photo/130178585/m%3D2048/300d71f784f679d5e70fadda8ad7d68f)
+
+乘法的 位置关系, 从右往左访问, 同时从右往左读:
+
+ 当 index i 和 index j 时, base 位置在 i+j, carry 位置在 i+j+1. base位置因为加上了原来的值来计算进位, 所以直接赋值, carry位置则需要累加
+
+```java
+public String multiply(String num1, String num2) {
+    char[] arr1 = num1.toCharArray();
+    char[] arr2 = num2.toCharArray();
+    
+    int[] res = new int[arr1.length + arr2.length];
+    for(int i = arr1.length - 1; i >= 0; i--){
+        for(int j = arr2.length - 1; j >= 0; j--){
+            int mul = (arr1[i] - '0') * (arr2[j] - '0');
+            int carr = i+j, base = i+j+1;
+            int sum = mul + res[base];
+            res[carr] += sum / 10;
+            res[base] = sum % 10;
+        }
+    }
+    StringBuilder sb = new StringBuilder();
+    for(int i : res)    if(!(sb.length() == 0 && i==0)) sb.append(i);
+    return sb.length() == 0 ? "0": sb.toString();
+}
+```

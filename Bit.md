@@ -117,3 +117,23 @@ public int maxProduct(String[] words) {
    return res;
 }
 ```
+
+1461. Check If a String Contains All Binary Codes of Size K: https://leetcode.com/problems/check-if-a-string-contains-all-binary-codes-of-size-k/
+
+滑窗, 并使用 bit 计算 visited 存到 hashset, 检查 set 的大小是否符合要求
+
+```java
+public boolean hasAllCodes(String s, int k) {
+   Set<Integer> hs = new HashSet<>();
+   for(int i = 0; i <= s.length() - k; i++){
+       int temp = 0;
+       for(int j = 0; j < k; j++){
+           temp |= (s.charAt(i + j) - '0') << (k-j);
+       }
+       if(hs.contains(temp))   continue;
+       hs.add(temp);
+   }
+   
+   return hs.size() == Math.pow(2, k);
+}
+```

@@ -232,3 +232,49 @@ public int numberOfWeakCharacters(int[][] properties) {
   return res;
 }
 ```
+
+## 42. Trapping Rain Water
+https://leetcode.com/problems/trapping-rain-water/
+
+接雨水, 木桶效应, 看最低的木板, 两种办法: 
+1. 记录从右到左最大高度, 取min(leftMax, rightMax) - cur 即可
+2. 双指针, 首先找到可以开始接雨水的位置 left 和 right, 同上理使用 较小的高度 - 当前侧更小的cur高度 = 当前cur位置装水量; 通过维护 left 和 right, 确保能装上水即可
+
+```java
+public int trap(int[] height) {
+  // 1. 2-traversal   O(n) O(n)
+  int[] right2left = new int[height.length];
+  int res = 0, left2right = 0;
+  
+  for(int i = height.length - 1; i >= 0; i--){
+      right2left[i] = Math.max(height[i], right2left[Math.min(height.length - 1, i + 1)]);
+  }
+  
+  for(int i = 0; i < height.length; i++){
+      left2right = Math.max(height[i], left2right);
+      res += Math.min(right2left[i], left2right) - height[i];
+  }
+  return res;
+  
+  // 2. 2 ptr O(n) O(1)
+  int left = 0, right = height.length - 1, res = 0;
+  // find first left & right 2 wall
+  while(left < right && height[left] <= height[left+1])   left++;
+  while(left < right && height[right] <= height[right-1])   right--;
+  
+  while(left < right){
+      int leftHeight = height[left];
+      int rightHeight = height[right];
+      if(leftHeight < rightHeight){
+          while(left < right && height[++left] <= leftHeight){
+              res += leftHeight - height[left];
+          }
+      }else{
+          while(left < right && height[--right] <= rightHeight){
+              res += rightHeight - height[right];
+          }
+      }
+  }
+  return res;
+}
+```

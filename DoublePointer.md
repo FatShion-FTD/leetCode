@@ -214,3 +214,71 @@ public int longestSubarray(int[] nums, int limit) {
     return res;
 }
 ```
+
+## SubArray & Subsequence
+
+### Longest common subarray, 滑窗即可, 也可DP
+```java
+public int longestCommonSubarray(String s1, String s2) {
+    int len = 0;
+    int[] subW1 = new int[w1.length()];
+    for(int i = 0; i < w1.length(); i++){
+        int count = 0, k = i, j = 0;
+        while(j < w2.length()){
+            while(j < w2.length() && k < w1.length() && w1.charAt(k) == w2.charAt(j)){
+                count += 1;
+                k++;j++;
+            }
+            subW1[i] = Math.max(subW1[i], count);
+            count = 0;
+            k = i;
+            j++;
+        }
+    }
+    for(int i = 0; i < w1.length(); i++)    len = Math.max(len, subW1[i]);
+    return len;
+}
+// Subarray 体现为 没有任何非连续状态继承
+public int longestCommonSubarray(String s1, String s2) {
+    int n = s1.length(), m = s2.length();
+    int[][] dp = new int[n+1][m+1];
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= m; j++){
+            if(s1.charAt(i-1) == s2.charAt(j-1)){
+                dp[i][j] = dp[i-1][j-1] + 1;
+            }else{
+                dp[i][j] = 0;
+            }
+        }
+    }
+    return dp[n][m];
+}
+```
+
+### 1143. Longest Common Subsequence (LCS)
+https://leetcode.com/problems/longest-common-subsequence/
+
+DP[i][j] 记录 到 i 和 j 为止的最长子串长度, 如果 i-1 和 j-1 相同则: 
+
+dp[i][j] = dp[i-1][j-1] + 1;
+
+否则, 选择继承 i-1 和 j-1 的最大的状态, 而不是再重新遍历:
+
+dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+
+```java
+public int longestCommonSubsequence(String s1, String s2) {
+    int n = s1.length(), m = s2.length();
+    int[][] dp = new int[n+1][m+1];
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= m; j++){
+            if(s1.charAt(i-1) == s2.charAt(j-1)){
+                dp[i][j] = dp[i-1][j-1] + 1;
+            }else{
+                dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+    }
+    return dp[n][m];
+}
+```

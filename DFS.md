@@ -86,3 +86,45 @@ public void dfs(String x, String p, double v) {
    }
 }
 ```
+
+## 980. Unique Paths III
+https://leetcode.com/problems/unique-paths-iii/
+
+非常直接的 暴力DFS 解决hard问题典型
+
+```java    
+ int res = 0;
+ int sx = -1, sy = -1, valid = 0;
+ 
+ public int uniquePathsIII(int[][] grid) {
+     for(int i = 0; i < grid.length; i++){
+         for(int j = 0; j < grid[0].length; j++){
+             if(grid[i][j] == 0) valid += 1;
+             else if(grid[i][j] == 1){
+                 sx = i; sy = j; valid += 1;
+             }
+         }
+     }
+     dfs(grid, sx, sy);
+     return res;
+ }
+ 
+ private void dfs(int[][] grid, int x, int y){
+     // -1 or -2 no way
+     if(x < 0 || x >= grid.length || y < 0 || y >= grid[0].length || grid[x][y] < 0)
+         return;
+     // end
+     if(grid[x][y] == 2){
+         if(valid == 0)  res+=1;
+         return;
+     }
+     grid[x][y] = -2;
+     valid -= 1;
+     dfs(grid, x+1, y);
+     dfs(grid, x-1, y);
+     dfs(grid, x, y+1);
+     dfs(grid, x, y-1);
+     grid[x][y] = 0;
+     valid += 1;
+ }
+```

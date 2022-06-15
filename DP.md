@@ -659,3 +659,130 @@ Minimum Domino Rotations For Equal Row: https://leetcode.com/problems/minimum-do
      return -1;
  }
 ```
+
+## 2304. Minimum Path Cost in a Grid
+https://leetcode.com/problems/minimum-path-cost-in-a-grid/
+
+二维DP, 但是三维遍历, 本来思考DFS, 但是需要memory, 直接转DP, 转移方程在DFS中推导: 
+
+mem[i+1][k] = Math.min(mem[i+1][k], mem[i][j] + nextRow[k] + grid[i+1][k])
+
+```java
+ public int minPathCost(int[][] grid, int[][] moveCost) {
+     int n = grid.length;
+     if(n == 0 || grid == null || moveCost.length == 0 || moveCost == null)  return 0;
+     int m = grid[0].length;
+     int res = Integer.MAX_VALUE;
+     
+     int[][] mem = new int[n + 1][m + 1];
+     for(int j = 0; j < m; j++)  mem[0][j] = grid[0][j];
+     for(int i = 1; i < n; i++)  Arrays.fill(mem[i], Integer.MAX_VALUE);
+     
+     for(int i = 0; i < n - 1; i++){
+         for(int j = 0; j < m; j++){
+             int[] nextRow = moveCost[grid[i][j]];
+             for(int k = 0; k < m; k++){
+                 mem[i+1][k] = Math.min(mem[i+1][k], mem[i][j] + nextRow[k] + grid[i+1][k]);
+             }
+         }
+     }
+     for(int j = 0; j < m; j++)  res = Math.min(res, mem[n-1][j]);
+     return res;
+ }
+```
+
+## 120. Triangle
+从上到下DP: dp[i+1][j] = Math.min(dp[i+1][j], dp[i][j] + t.get(i+1).get(j)) 和 dp[i+1][j+1] = Math.min(dp[i+1][j+1], dp[i][j] + t.get(i+1).get(j+1))
+
+从下到上DP: t[i][j] += Math.min(t[i+1][j], t[t+1][j+1])
+
+```java
+ public int minimumTotal(List<List<Integer>> t) {
+     int n = t.size();
+     if(n == 0)  return 0;
+     
+     int m = t.get(n-1).size();
+     // 1. up2botm, i - row index, j - index in row, O(mn)
+     // dp[i+1][j] = Math.min(dp[i+1][j], dp[i][j] + t.get(i+1).get(j))
+     // dp[i+1][j+1] = Math.min(dp[i+1][j+1], dp[i][j] + t.get(i+1).get(j+1))
+     
+     int[][] dp = new int[n][m+1];
+     for(int[] row : dp) Arrays.fill(row, Integer.MAX_VALUE);
+     dp[0][0] = t.get(0).get(0);
+     
+     for(int i = 0; i < n - 1; i++){
+         for(int j = 0; j < i + 1; j++){
+             dp[i+1][j] = Math.min(dp[i+1][j], dp[i][j] + t.get(i+1).get(j));
+             dp[i+1][j+1] = Math.min(dp[i+1][j+1], dp[i][j] + t.get(i+1).get(j+1));
+         }
+     }
+     
+     int res = Integer.MAX_VALUE;
+     for(int i = 0; i < m; i++)  res = Math.min(res, dp[n-1][i]);
+     return res;
+     
+     // 2. botm-up, O(n)
+     // t[i][j] += Math.min(t[i+1][j], t[t+1][j+1])
+     for(int i = t.size() - 2; i >= 0; i--){
+         for(int j = 0; j < t.get(i).size(); j++){
+            t.get(i).set(j, t.get(i).get(j) + Math.min(t.get(i+1).get(j), t.get(i+1).get(j+1))); 
+         }
+     }
+     return t.get(0).get(0);
+ }
+```
+# Unique Paths 系列
+## 62. Unique Paths
+https://leetcode.com/problems/unique-paths/
+
+dp[i][j] = = dp[i-1][j] + dp[i][j-1]
+
+```java
+ public int uniquePaths(int m, int n) {
+     int[][] dp = new int[m+1][n+1];
+     Arrays.fill(dp[0], 1);
+     for(int i = 0; i < m; i++)  dp[i][0] = 1;
+     
+     for(int i = 1; i < m; i++){
+         for(int j = 1; j < n; j++){
+             dp[i][j] = dp[i-1][j] + dp[i][j-1];
+         }
+     }
+     return dp[m-1][n-1];
+ }
+```
+63. Unique Paths II
+https://leetcode.com/problems/unique-paths-ii/
+
+带障碍, 只需要避开障碍即可, 障碍 = 0
+```java
+ public int uniquePathsWithObstacles(int[][] o) {
+     int n = o.length;
+     if(n == 0 || o == null) return 0;
+     
+     int m = o[0].length;
+     int[][] dp = new int[n+1][m+1];
+     // path in 0-row
+     for(int i = 0; i < m; i++){
+         if(o[0][i] == 0){
+             dp[0][i] = 1;
+         }else break;
+     }
+     
+     // path in 0-col
+     for(int i = 0; i < n; i++){
+         if(o[i][0] == 0){
+             dp[i][0] = 1;
+         }else break;
+     }
+     
+     for(int i = 1; i < n; i++){
+         for(int j = 1; j < m; j++){
+             if(o[i][j] == 0){
+                 dp[i][j] = dp[i-1][j] + dp[i][j-1];
+             }
+         }
+     }
+     return dp[n-1][m-1];
+ }
+```
