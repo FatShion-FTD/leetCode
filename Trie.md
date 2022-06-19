@@ -195,3 +195,56 @@ class WordFilter {
     }
 }
 ```
+
+## 1268. Search Suggestions System
+https://leetcode.com/problems/search-suggestions-system/
+
+模板题
+
+```java
+class Solution {
+    class Trie{
+        List<String> list;
+        Trie[] next;
+        public Trie(){
+            list = new ArrayList<>();
+            next = new Trie[26];
+        }
+    }
+    
+    Trie root = new Trie();
+    
+    public List<List<String>> suggestedProducts(String[] products, String searchWord) {
+        for(String p : products){
+            insert(root, p);
+        }
+        
+        List<List<String>> res = new ArrayList<>();
+        Trie node = root;
+        int i = 0;
+        for(; i < searchWord.length(); i++){
+            node = node.next[searchWord.charAt(i) - 'a'];
+            if(node == null)    break;
+            
+            List<String> list = node.list;
+            Collections.sort(list, (o1, o2) -> o1.compareTo(o2));
+            if(list.size() > 3)
+                list = list.subList(0, 3);
+            
+            res.add(list);
+        }
+        
+        for(; i < searchWord.length(); i++) res.add(new ArrayList<>());
+        return res;
+    }
+    
+    private void insert(Trie node, String s){
+        for(int i = 0; i < s.length(); i++){
+            if(node.next[s.charAt(i) - 'a'] == null)
+                node.next[s.charAt(i) - 'a'] = new Trie();
+            node = node.next[s.charAt(i) - 'a'];
+            node.list.add(s);
+        }
+    }
+}
+```

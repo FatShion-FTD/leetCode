@@ -8,6 +8,18 @@
 
 ~ 取反操作: 1 0 对调
 
+\>> ? 右移 ? 位   
+
+\>>> ? 无符号右移 ? 位, 无符号就是符号位也是移动, 如 -8 >>= 2, 变成正数
+
+\<< ? 左移 ? 位
+
+\<<< 无符号左移 ? 位
+
+左移一位 = ori * 2
+
+右移一位 = ori / 2
+
 ## Bit 加减乘除
 ```java
 // 加法
@@ -90,7 +102,7 @@ public int missingNumber(int[] nums) {
 
 318. Maximum Product of Word Lengths: https://leetcode.com/problems/maximum-product-of-word-lengths/
 
-使用 OR 和 int 记录 word 的每一位是否存在 char, 1 存在, 0 不存在
+使用 OR 记录 word 的每一位是否存在 char, 1 存在, 0 不存在, 编码成 one-hot int 进行储存
 
 temp |= 1 << (words[i].charAt(j) - 'a');
 

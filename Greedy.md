@@ -156,3 +156,25 @@ Two City Scheduling: https://leetcode.com/problems/two-city-scheduling/
      return candidate;
  }
 ```
+
+
+## 2311. Longest Binary Subsequence Less Than or Equal to K
+https://leetcode.com/problems/longest-binary-subsequence-less-than-or-equal-to-k/
+
+从右往左尽量找0, 同时 maintain 最高位为 1 时的情况, 用于 从 k 中减去
+
+```java
+public int longestSubsequence(String s, int k) {
+    int res = 0, tot = 1, n = s.length();
+    for(int i = n-1; i >= 0; i--){
+        if(tot <= k || s.charAt(i) == '0'){ // 最大值允许 或 当前为 0
+            k -= tot * (s.charAt(i) - '0');
+            res++;
+        }
+        if(tot <= k){
+            tot *= 2;   // 左移一位, 保持最高位为 1 的最大值
+        }
+    }
+    return res;
+}
+```

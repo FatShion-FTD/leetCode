@@ -866,3 +866,30 @@ public int integerBreak(int n) {
 }
 ```
 
+## 2311. Longest Binary Subsequence Less Than or Equal to K
+https://leetcode.com/problems/longest-binary-subsequence-less-than-or-equal-to-k/
+
+依然看到子序列, 考虑DP. 子序列DP一般都考虑 length 入手, 即 长度为 i 的情况下最优子状态.    
+1. 在 bit manuiplation 中, 左移一位 = ori * 2, 所以使用 dp[i] * 2 相当于左移一位, 构建新数字:    
+   dp[i] * 2 + c - '0' 
+2. 遍历 并 查询每个 char 构建的新数字 是否 小于等于 k, 构建新数字的办法就是1; 使用 j 记录 seq长度, 当新数字有效, 更新 j; 每次访问 char, 就更新所有到当前长度的最小值.
+
+```java
+public int longestSubsequence(String s, int k) {
+    // dp[j+1] = dp[j] * 2 + c -'0'; 构建小于k的转移
+    // dp[i] = Math.min(dp[i], dp[i-1] * 2 + c -'0';); i-1是长度-1的seq最小值
+    int[] dp = new int[s.length() + 1]; // 存 长度为 i 的最小seq值
+    int j = 0;
+    for(char c : s.toCharArray()){
+        if(dp[j] * 2 + c -'0' <= k){    // 左移一位 = num * 2
+            dp[j+1] = dp[j] * 2 + c -'0';
+            j++;    // 有效长度 + 1
+        }
+        // 更新到当前长度为止, 所有长度的最小值
+        for(int i = j; i > 0; i--){
+            dp[i] = Math.min(dp[i], dp[i-1] * 2 + c -'0');
+        }
+    }
+    return j;
+}
+```
