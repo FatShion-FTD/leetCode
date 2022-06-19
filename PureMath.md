@@ -50,3 +50,39 @@ public int minimumRounds(int[] tasks) {
   return count;
 }
 ```
+
+## 343. Integer Break
+https://leetcode.com/problems/integer-break/
+
+根据数学关系, 贪心, 找 3, 留 4 即可
+```java
+public int integerBreak(int n) {
+  if(n == 2)  return 1;
+  if(n == 3)  return 2;
+  
+  // find 3 and 4
+  int res = 1;
+  while(n > 4){
+      n -= 3;
+      res *= 3;
+  }
+  return res * n;
+}
+```
+
+## 2310. Sum of Numbers With Units Digit K
+https://leetcode.com/problems/sum-of-numbers-with-units-digit-k/
+
+跟据数学关系, 乘法的个位数可以作为验证 乘法是否合理的基础, 如 9 * 9 = 81, i * 9 = ?1, 遍历所有长度, 使用个位数进行验证
+
+```java
+public int minimumNumbers(int num, int k) {
+  if(num == 0)    return 0;
+  if(k == 0)  return num % 10 == 0 ? 1 : -1;
+  for(int i = 1; i <= num / k; i++){   // from 1 to n * k == num
+      if(num % 10 == (i * k) % 10)
+          return i;
+  }
+  return -1;
+}
+```

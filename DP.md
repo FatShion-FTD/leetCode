@@ -584,6 +584,14 @@ Longest Palindromic Substring: https://leetcode.com/problems/longest-palindromic
 1. dp[start][end] = true if len == 0
 2. dp[start][end] = chars[start] == chars[end] if len == 1
 3. dp[start][end] = chars[start] == chars[end] && dp[start+1][end-1] if len > 1
+
+解法2: 顶级解法 manacher 
+https://www.acwing.com/file_system/file/content/whole/index/content/446985/
+1. 在每个char前和结尾处插入 特殊字符, 将 N 变为 2N+1 的奇数字符串
+2. 使用半径rad作为快速搜索和扩展的trick, 记录 最右回文串的 圆心 id 和 半径 right
+3. 如果 i < right, 半径 rad 寻找存在加速可能: 使用对称性, 在 id 左侧找到 和 i - id == id - j 一样的 j, j = 2 * id - i. 如果以 j 为中心的 rad 超过了 right - id, 则需要取较小值, 因为在右侧相应的 i 位置没有验证: 
+Math.min(right - i, rad[2 * id - i])
+4. 暴力枚举推出 以 i 为中心的新 rad, 更新 right, id, rad[i]即可
 ```java
 public String longestPalindrome(String s) {
     char[] chars = s.toCharArray();
@@ -609,6 +617,59 @@ public String longestPalindrome(String s) {
     
     return res;
 }
+
+ public String longestPalindrome(String s) {
+     // Manacher algo
+     // 1.add specfic char
+     StringBuilder sb = new StringBuilder();
+     sb.append('#');
+     for(char c : s.toCharArray()){
+         sb.append(c);
+         sb.append('#');
+     }
+     
+     System.out.println(sb.toString());
+     
+     // 2. features
+     int[] rad = new int[sb.length()];   // rad at each index
+     int id = -1;    // rightmost palindrome index
+     int right = -1; // rightmost palindrome right bound
+     int max = 1, idx = 0;
+     
+     // 3. simulate
+     for(int i = 0; i < sb.length(); i++){
+         rad[i] = right > i ? Math.min(right - i, rad[2 * id - i]) : 1;
+         while(i - rad[i] >= 0 && i + rad[i] < sb.length() 
+               && sb.charAt(i+rad[i]) == sb.charAt(i-rad[i])){
+             rad[i]++;
+         }
+         
+         // update rightmost
+         if(i + rad[i] > right){
+             right = i + rad[i];
+             id = i;
+         }
+         
+         // update max
+         if(rad[i] > max){
+             max = rad[i]; 
+             idx = i;
+         }
+     }
+     
+     System.out.println("rad: " + max);
+     System.out.println("idx: " + idx);
+     
+     // rebuild 
+     StringBuilder res = new StringBuilder();
+     for(int i = idx - max + 1; i < idx + max - 1; i++){
+         if(sb.charAt(i) != '#'){
+             res.append(sb.charAt(i));
+         }
+     }
+     
+     return res.toString();
+ }
 ```
 
 ## 排列组合DP
@@ -786,3 +847,22 @@ https://leetcode.com/problems/unique-paths-ii/
      return dp[n-1][m-1];
  }
 ```
+
+## 343. Integer Break
+https://leetcode.com/problems/integer-break/
+
+跟据 长度 i 和 分的段数 j 进行DP,  j * (i-j) 是直接分成两段 i-j 和 j, 作为base case; dp[j] * (i-j) 分为 dp[j] 和 i-j , 是继承 dp[j] 
+
+```java
+public int integerBreak(int n) {
+    int[] dp = new int[n+1];
+    for(int i = 2; i <= n; i++){
+        for(int j = 1; j < i; j++){
+            // j * (i-j) 分为两段, dp[j] * (i-j), i-j 乘上 j 之前的累计结果
+            dp[i] = Math.max(dp[i], Math.max(j * (i-j), dp[j] * (i-j)));
+        }
+    }
+    return dp[n];
+}
+```
+

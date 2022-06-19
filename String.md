@@ -263,3 +263,73 @@ public String digitSum(String s, int k) {
     return sb.toString();
 }
 ```
+
+## 1048. Longest String Chain
+https://leetcode.com/problems/longest-string-chain/
+
+先根据 str 的长度排序, 单增; 然后从短到长对每个 str 进行删除字符处理, 查询map是否存在对应的 deleted str, 如果有且新 chain 长度更长, 更新; 每个 str 结束, 比较结果
+
+```java
+public int longestStrChain(String[] strs) {
+  // only a-z
+  // predecessor A: add one any letter to A, A == B
+  // from shortest to longer, build String chain by using map
+  
+  int res = 0;
+  Arrays.sort(strs, (o1, o2) -> o1.length() - o2.length());  // ascending order 
+  Map<String, Integer> map = new HashMap<>();
+  
+  for(String s : strs){
+      map.put(s, 1);
+      for(int i = 0; i < s.length(); i++){
+          StringBuilder sb = new StringBuilder(s);
+          String nextStr = sb.deleteCharAt(i).toString();
+          if(map.containsKey(nextStr) && map.get(nextStr) + 1 > map.get(s))
+              map.put(s, map.get(nextStr) + 1);
+      }
+      res = Math.max(res, map.get(s));
+  }
+  return res;
+}
+```
+
+## 527. Word Abbreviation
+https://leetcode.com/problems/word-abbreviation/
+
+首先实现构建Abbr函数, 使用prefix记录每个对应的 str prefix长度, 每次逐个遍历, 使用set去重即可 
+
+```java
+public List<String> wordsAbbreviation(List<String> words) {
+  int n = words.size();
+  int[] prefix = new int[n];
+  String[] strs = new String[n];
+  Arrays.fill(prefix, 1);
+  for(int i = 0; i < n; i++)  strs[i] = buildAbbr(words.get(i), prefix[i]);
+  
+  for(int i = 0; i < n; i++){
+      while(true){
+          Set<Integer> set = new HashSet<>();
+          for(int j = i+1; j < n; j++){
+              if(strs[i].equals(strs[j])) set.add(j);
+          }
+          if(set.isEmpty())   break;
+          set.add(i);
+          for(int k : set){
+              strs[k] = buildAbbr(words.get(k), ++prefix[k]);
+          }
+      }
+  }
+  return Arrays.asList(strs);
+}
+// 0-th char + length() - 2 + length()-1-th char
+// 1 char abbreviated not valid
+// 0 - i th char + length() - i - 1 + length()-1-th char
+private String buildAbbr(String s, int k){
+  if(k >= s.length() - 2) return s;
+  StringBuilder sb = new StringBuilder();
+  sb.append(s.substring(0, k));
+  sb.append(s.length() - k - 1);
+  sb.append(s.charAt(s.length() - 1));
+  return sb.toString();
+}
+```
