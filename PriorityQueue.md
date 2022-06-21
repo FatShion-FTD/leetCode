@@ -85,3 +85,64 @@ class KthLargest {
     }
 }
 ```
+
+## 1642. Furthest Building You Can Reach
+https://leetcode.com/problems/furthest-building-you-can-reach/
+
+不能使用DP, 不存在最优子问题, 因为一个是 sum - val, 一个是 # - 1. 最优子结构存在重叠
+
+使用 Greedy, 存储最大的jump, 退化为 Kth largerest element 问题
+
+```java
+public int furthestBuilding(int[] heights, int bricks, int ladders) {
+    if(heights == null || heights.length == 0)  return 0;
+    
+    PriorityQueue<Integer> pq = new PriorityQueue<>();    // store the largerest jumps
+    int sum = 0, i = 0;
+    for(; i < heights.length - 1; i++){
+        if(heights[i] < heights[i+1]){
+            int diff = heights[i+1] - heights[i];
+            if(pq.size() < ladders){
+                pq.offer(diff);
+            }else{
+                // find k-th largerest element in the array
+                if(pq.isEmpty() || diff <= pq.peek()){
+                    sum += diff;
+                }else{
+                    pq.offer(diff); // update largerer 
+                    sum += pq.poll();
+                }
+            }
+        }
+        
+        if(sum > bricks)    break;
+    }
+    return i;
+}
+```
+
+## 2268. Minimum Number of Keypresses
+https://leetcode.com/problems/minimum-number-of-keypresses/
+
+set 记数, PQ排序, 排序完毕直接 poll * coefficient 即可
+
+```java
+public int minimumKeypresses(String s) {
+    Map<Character, Integer> map = new HashMap<>();
+    char[] chars = s.toCharArray();
+    for(char c : chars){
+        int count = map.getOrDefault(c, 0);
+        map.put(c, count + 1);
+    }
+    PriorityQueue<Map.Entry<Character, Integer>> pq = new PriorityQueue<>((o1, o2) -> o2.getValue() - o1.getValue());
+    for(Map.Entry<Character, Integer> e : map.entrySet()){
+        pq.offer(e);
+    }
+    int res = 0, num = 0;
+    while(!pq.isEmpty()){
+        res += ((num / 9) + 1) * pq.poll().getValue();
+        num++;
+    }
+    return res;
+}
+```

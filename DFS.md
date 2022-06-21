@@ -128,3 +128,29 @@ https://leetcode.com/problems/unique-paths-iii/
      valid += 1;
  }
 ```
+
+## 97. Interleaving String
+https://leetcode.com/problems/interleaving-string/
+
+![https://assets.leetcode.com/uploads/2020/09/02/interleave.jpg](https://assets.leetcode.com/uploads/2020/09/02/interleave.jpg)
+
+把两个 String 按照 row 和 col 排列, 就形成了一个 2D Array, 在这里找到 valid String == s3 即可
+
+```java
+ public boolean isInterleave(String s1, String s2, String s3) {
+     int n = s1.length(), m = s2.length(), l = s3.length();
+     if(n + m != l)  return false;
+     
+     return dfs(s1, s2, s3, 0, 0, 0, new boolean[n+1][m+1]);
+ }
+ 
+ private boolean dfs(String s1, String s2, String s3, int row, int col, int len, boolean[][] visited){
+     if(visited[row][col])   return false;
+     if(len == s3.length())  return true;
+     boolean res = 
+         row < s1.length() && s1.charAt(row) == s3.charAt(len) && dfs(s1, s2, s3, row + 1, col, len + 1, visited) ||
+         col < s2.length() && s2.charAt(col) == s3.charAt(len) && dfs(s1, s2, s3, row, col + 1, len + 1, visited) ;
+     visited[row][col] = true;
+     return res;
+ }
+```
