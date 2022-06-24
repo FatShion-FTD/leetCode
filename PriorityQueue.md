@@ -24,7 +24,9 @@ public int findKthLargest(int[] nums, int k) {
         pq.offer(nums[i]);
     }
     for(int i = k; i < nums.length; i++){
+        // less than the smallest one, ignore
         if(nums[i] <= pq.peek())    continue;
+        // add new largerer one, remove smallest one
         pq.offer(nums[i]);
         pq.poll();
     }
@@ -146,3 +148,66 @@ public int minimumKeypresses(String s) {
     return res;
 }
 ```
+# Course Schedule 系列
+## 207. Course Schedule
+https://leetcode.com/problems/course-schedule/
+
+问题抽象: 找到是否有 环形的 先修课, 如 (0,1) (1,0) -> 找到选修课中是否存在环
+
+找环的算法: Topological Sort 拓扑排序. BFS 实现核心:
+1. 维持一个 Graph, 存储 先修课 pre[1] -> 后修课pre[1] 的关系, 和 一个 indegree 用来存储每个 node 的入度
+2. 从 indegree 中找到入度为 0 的 node, 并将其加入到 queue 中, 此时使用 BFS 的思路
+3. 当 queue 不为空时, 取出 queue 的头元素, 删除所有和他相关的 edge, 即: 将其指向的 node 的 indegree - 1, 如果相关的 node indegree 为 0, 则加入到 queue 中
+4. 记录访问 node 的次数 count, 如果所有 node 都访问到, 则 true
+
+```java
+public boolean canFinish(int n, int[][] prerequisites){
+    int[] indegree = new int[n];
+    List<List<Integer>> graph = new ArrayList<>();
+    for(int i = 0; i < n; i++){
+        graph.add(new ArrayList<>());
+    }
+    for(int[] p : prerequisites){
+        indegree[p[1]]++;
+        graph.get(p[0]).add(p[1]);
+    }
+    int count = 0;
+    Queue<Integer> q = new LinkedList<>();
+    for(int i = 0; i < n; i++){
+        if(indegree[i] == 0) q.offer(i);
+    }
+    while(!q.isEmpty()){
+        int cur = q.poll();
+        count++;
+        for(int next : graph.get(cur)){
+            indegree[next]--;
+            if(indegree[next] == 0) q.offer(next);
+        }
+    }
+    return count == n;
+}
+```
+
+## 630. Course Schedule III
+https://leetcode.com/problems/course-schedule-iii/
+
+贪心 + PQ: 跟据关系, 一门课程, 如果当前是OK的 time 和 end, 则他之前任何一门课程删除, 他依然是OK的
+1. 先按照结束时间排序, 课程相对按照顺序上课; 然后创建一个 max heap 的 PQ, 用来存每门课程的 time
+2. 总时间 tot 先加上 课程时间, 如果 tot < 当前课程的结束时间则没有问题; 如果 tot > cur End, 则把之前最大时常 time 的课程去掉即可
+
+```java
+public int scheduleCourse(int[][] courses) {
+    // finish A Early AP
+    Arrays.sort(courses, (o1, o2) -> o1[1] - o2[1]);
+    PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
+    int tot = 0;
+    for(int[] c : courses){
+        int time = c[0], end = c[1];
+        tot += time;
+        pq.offer(time);
+        while(!pq.isEmpty() && tot > end)  tot -= pq.poll();
+    }
+    return pq.size();
+}
+```
+

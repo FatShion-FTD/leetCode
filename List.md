@@ -292,3 +292,28 @@ public ListNode removeNthFromEnd(ListNode head, int n) {
 }
 ```
 
+## 143. Reorder List
+https://leetcode.com/problems/reorder-list/
+
+使用 Stack 存储所有 Node, 
+
+```java
+public void reorderList(ListNode head) {
+    ListNode node = head;
+    Deque<ListNode> stack = new ArrayDeque<>();
+    while(node != null){
+        stack.push(node);
+        node = node.next;
+    }
+    ListNode temp = head;
+    int n = stack.size();
+    for(int i = 0; i < n/2; i++){
+        ListNode tail = stack.pop();
+        tail.next = temp.next;  // ptr to SAME next
+        temp.next = tail;
+        temp = temp.next.next;
+    }
+    temp.next = null;   // remove potential cycle
+    return;
+}
+```

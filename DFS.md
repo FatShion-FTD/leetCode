@@ -154,3 +154,66 @@ https://leetcode.com/problems/interleaving-string/
      return res;
  }
 ```
+
+## 93. Restore IP Addresses
+https://leetcode.com/problems/restore-ip-addresses/
+
+B事儿比较多的 backtracking, IP 验证三个点:
+1. num 不能大于255
+2. 刚好4个
+3. 可以 0, 但是不能 leading zero
+
+```java
+ List<String> res;
+ public List<String> restoreIpAddresses(String s) {
+     res = new ArrayList<>();
+     dfs(s, 0, new ArrayList<>());
+     return res;
+ }
+ 
+ private void dfs(String s, int index, List<String> t){
+     if(index > s.length() || t.size() > 4)  return;
+     if(index == s.length() && t.size() == 4){
+         StringBuilder sb = new StringBuilder();
+         for(String str : t) sb.append(str + '.');
+         sb.deleteCharAt(sb.length() - 1);
+         res.add(sb.toString());
+         return;
+     }
+     for(int i = 0; i < 3 && i + index < s.length(); i++){
+         String sub = s.substring(index, index + i + 1);
+         int num = Integer.parseInt(sub);
+         if(i > 0 && num / 10 == 0) return;
+         if(num > 255)   return;
+         t.add(sub);
+         dfs(s, i + index + 1, t);
+         t.remove(t.size() - 1);
+     }
+ }
+```
+
+## 90. Subsets II
+https://leetcode.com/problems/subsets-ii/
+
+子集2, 核心: 排序后去重, but for duplicates, (1,1) -> ONE 1, TWO 1, but NOT 2 ONE 1. Which means always carry one if duplicated, after that, AVOID add it again
+
+```java
+ List<List<Integer>> res;
+ public List<List<Integer>> subsetsWithDup(int[] nums) {
+     res = new ArrayList<>();
+     Arrays.sort(nums);
+     dfs(new ArrayList<>(), 0, nums);
+     return res;
+ }
+ 
+ private void dfs(List<Integer> t, int index, int[] nums){
+     if(index == nums.length + 1)    return;
+     res.add(new ArrayList<>(t));
+     for(int i = index; i < nums.length; i++){
+         if(i != index && nums[i] == nums[i-1])  continue;   // always carry one
+         t.add(nums[i]);
+         dfs(t, i + 1, nums);
+         t.remove(t.size() - 1);
+     }
+ }
+```

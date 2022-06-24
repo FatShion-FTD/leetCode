@@ -282,3 +282,34 @@ public int longestCommonSubsequence(String s1, String s2) {
     return dp[n][m];
 }
 ```
+
+## 189. Rotate Array
+https://leetcode.com/problems/rotate-array/
+
+Rotate 的核心在于 reverse, 不管是 rotate array 还是 rotate matrix, 都可以用 **reverse**. 
+
+对于 Array, 将 array 分为两个部分, 分别reverse, 再reverse即可的都结果. 
+
+1 2 3 4 5 6 -> 4 3 2 1 5 6 -> 4 3 2 1 6 5 -> 5 6 1 2 3 4
+
+对于 rotate matrix, 则是使用 transpose(也是一种 reverse), transpose 后再 reverse
+
+```java
+public void rotate(int[] nums, int k) {
+    int shift = k % nums.length, n = nums.length;
+    int start = 0, newStart = n - shift;
+    reverse(nums, 0, n - shift - 1);
+    reverse(nums, n - shift, n - 1);
+    reverse(nums, 0, n - 1);        
+    return;
+}
+
+private void reverse(int[] nums, int start, int end){
+    while(start < end){
+        int temp = nums[start];
+        nums[start++] = nums[end];
+        nums[end--] = temp;
+    }
+    return;
+}
+```
