@@ -313,3 +313,29 @@ private void reverse(int[] nums, int start, int end){
     return;
 }
 ```
+
+## 1229. Meeting Scheduler
+https://leetcode.com/problems/meeting-scheduler/
+
+先排序, 再用 max(start1, start2) 和 min(end1, end2) 找到区间, 判断区间大小, 跟据 end 大小判断 i++ or j++. 可以免去 区间intersection 的判断
+
+```java
+public List<Integer> minAvailableDuration(int[][] slots1, int[][] slots2, int duration) {
+    Arrays.sort(slots1, (o1, o2) -> o1[1] - o2[1]);
+    Arrays.sort(slots2, (o1, o2) -> o1[1] - o2[1]);
+    int n1 = slots1.length, n2 = slots2.length, i = 0, j = 0;
+    List<Integer> res = new ArrayList<>();
+    while(i < n1 && j < n2){
+        int start = Math.max(slots1[i][0], slots2[j][0]);
+        int end = Math.min(slots1[i][1], slots2[j][1]);
+        if(end - start >= duration){
+            res.add(start);
+            res.add(start+ duration);
+            return res;
+        }
+        if(slots1[i][1] < slots2[j][1])  i++;
+        else j++;
+    }
+    return res;
+}
+```

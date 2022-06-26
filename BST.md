@@ -434,3 +434,39 @@ class BSTIterator {
     }
 }
 ```
+
+
+## 572. Subtree of Another Tree
+https://leetcode.com/problems/subtree-of-another-tree/
+
+递归, 递归结构: node.val == sub.val && isSameTree(root.left, sub.left) && isSameTree(root.right, sub.right)
+
+```java
+public boolean isSubtree(TreeNode root, TreeNode sub) {
+  if(root == null)    return false;
+  return isSameTree(root, sub) || isSubtree(root.left, sub) || isSubtree(root.right, sub);
+}
+
+private boolean isSameTree(TreeNode root, TreeNode sub){
+  if(root == null && sub == null) return true;
+  if(root == null || sub == null)    return false; 
+  return root.val == sub.val && isSameTree(root.left, sub.left) && isSameTree(root.right, sub.right);   
+}
+```
+
+## 226. Invert Binary Tree
+https://leetcode.com/problems/invert-binary-tree/
+
+```java
+public TreeNode invertTree(TreeNode root) {
+  if(root == null)    return null;
+  // 左右互换
+  TreeNode temp = root.left;
+  root.left = root.right;
+  root.right = temp;
+  // 递归子树
+  invertTree(root.left);
+  invertTree(root.right);
+  return root;
+}
+```

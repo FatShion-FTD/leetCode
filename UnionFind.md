@@ -227,3 +227,26 @@ class Solution {
     }
 }
 ```
+
+## 2316. Count Unreachable Pairs of Nodes in an Undirected Graph
+https://leetcode.com/problems/count-unreachable-pairs-of-nodes-in-an-undirected-graph/
+
+除了使用 UnionFind 把连通分量 group 到一起, 使用 HashMap 存 Group 和 count, 注意使用 long 避免 int 溢出
+
+```java
+    public long countPairs(int n, int[][] edges) {
+        UnionFind uf = new UnionFind(n);
+        for(int[] e : edges){
+            uf.union(e[0], e[1]);
+        }
+        Map<Integer, Integer> map = new HashMap<>();
+        for(int i = 0; i < n; i++)  
+            map.put(uf.find(i), map.getOrDefault(uf.find(i), 0) + 1);
+        long res = 0;
+        for(Integer key : map.keySet()){
+            long num = map.get(key);
+            res += num * (n-num); 
+        }
+        return res/2;
+    }
+```

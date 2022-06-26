@@ -20,6 +20,10 @@
 
 右移一位 = ori / 2
 
+Java Bit规则: 正数就是普通的二进制, 负数就是取反加1的二进制     
+如: -1 = 1b1111111111111111
+
+
 ## Bit 加减乘除
 ```java
 // 加法
@@ -147,5 +151,24 @@ public boolean hasAllCodes(String s, int k) {
    }
    
    return hs.size() == Math.pow(2, k);
+}
+```
+
+## 2317. Maximum XOR After Operations
+https://leetcode.com/problems/maximum-xor-after-operations/ 
+
+问题主要在于操作: nums[i] AND (nums[i] ^ x) where x can be ANY number
+
+1. 因为 AND 是最外围操作, 所以 不存在 0 变 1, 即 nums[i] 只减不增
+2. nums[i] ^ x 允许将 nums[i] 变为 当前位数下的任意值
+3. 此时寻找 XOR(nums) 最大, 变为在当前数组前提下, 保留各 bit 的 1, 即 res |= nums[i]
+
+```java
+class Solution {
+     public int maximumXOR(int[] nums) {
+        int res = 0;
+        for(int num : nums) res |= num;
+        return res;
+    }
 }
 ```

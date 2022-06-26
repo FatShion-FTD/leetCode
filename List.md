@@ -72,13 +72,13 @@ Linked List Cycle II: https://leetcode.com/problems/linked-list-cycle-ii/
 
 $fast = 2 * slow;$ 快指针路径是慢的2倍
 
-$fast = slow + n(b+c);$ 快慢相遇时, 快比慢多走N圈
+$fast = a + (b+c) + b;$ 快慢相遇时, 快比慢多走N圈
 
-$slow = n(b+c);$ 慢的路径就是N圈
+$slow = a + b$
 
-$fast = 0, slow = n(b+c);$ 让快 = 0, 慢 = n(b+c)
+$2(a + b)  = a + 2b + c -> a = c$
 
-$fast = a, slow = a + n(b+c)$ 快慢同时往前1步, 共走a步,  
+slow 从相遇点, fast 从 head, 二者同时走, 再次相遇刚好在环入口
 ![https://assets.leetcode-cn.com/solution-static/142/142_fig1.png](https://assets.leetcode-cn.com/solution-static/142/142_fig1.png)
 
 ```java
@@ -89,7 +89,7 @@ public ListNode detectCycle(ListNode head) {
         fast = fast.next.next;
         slow = slow.next;
         if(fast == slow){
-            slow = head;
+            fast = head;
             while(slow != fast){
                 slow = slow.next;
                 fast = fast.next;
@@ -317,3 +317,4 @@ public void reorderList(ListNode head) {
     return;
 }
 ```
+

@@ -178,3 +178,26 @@ public int longestSubsequence(String s, int k) {
     return res;
 }
 ```
+## 665. Non-decreasing Array
+https://leetcode.com/problems/non-decreasing-array/
+
+两种情况: 统计操作次数即可
+1. [1 3 2 4], 此时 n[i] = 2, n[i-2] = 1 <= n[i], 把 3 拉下去, 变成2; 
+2. [1 4 5 2], 此时 n[i] = 2, n[i-2] = 4 > n[i], 把 2 拉上来, 变成5
+
+```java
+public boolean checkPossibility(int[] nums) {
+   int count = 0;
+   for(int i = 1; i < nums.length; i++){
+       if(nums[i] < nums[i-1]){
+           if(i == 1 || nums[i-2] <= nums[i]){
+               nums[i-1] = nums[i];
+           }else{
+               nums[i] = nums[i-1];
+           }
+           count++;
+       }
+   }
+   return count <= 1;
+}
+```

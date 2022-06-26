@@ -210,4 +210,38 @@ public int scheduleCourse(int[][] courses) {
     return pq.size();
 }
 ```
+## 1354. Construct Target Array With Multiple Sums
+https://leetcode.com/problems/construct-target-array-with-multiple-sums/
 
+反向思想 + PQ + 计算加速:
+1. 正向遍历 potential path太多, 使用反向寻找, 只有一条路
+2. 使用PQ存所有元素, 因为每次都要找最大的, largerest -= sum(rest)
+3. 找到初始条件是否满足 1's
+4. 使用 % 进行计算加速, largerest = largerest - n * sum(rest)
+
+```java
+ public boolean isPossible(int[] target) {
+     int n = target.length;
+     
+     // 1. find largerest element in the target, target[lgest] -= sum(res)
+     // 2. repeat this progress until it's 1's
+     // 3. using % to accerlate the computation, reason: extreme larger number: 10000 
+     // and the rest sum is small: 1, using % = lagerest number - rest sum * n
+     PriorityQueue<Integer> pq = new PriorityQueue<>((o1, o2) -> o2 - o1);
+     int tot = 0;
+     for(int t : target){
+         pq.offer(t);
+         tot += t;
+     }
+     while(true){
+         int largerest = pq.poll();
+         tot = tot - largerest;
+         // if the max one is 1 or rest sum is 1(1 element left)
+         if(largerest == 1 || tot == 1)  return true;    
+         if(largerest < tot || tot <= 0 || largerest % tot == 0) return false;
+         largerest %= tot;
+         pq.offer(largerest);
+         tot += largerest;
+     }
+ }
+```
