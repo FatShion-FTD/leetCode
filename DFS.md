@@ -38,7 +38,7 @@ private void dfs(int[] nums, int depth){
 ```
 
 
-399. Evaluate Division: https://leetcode.com/problems/evaluate-division/
+## 399. Evaluate Division: https://leetcode.com/problems/evaluate-division/
 
 先使用edges, 构建双向有向图, 再通过dfs构建和UnionFind类似的 root 和 val 对应表.
 
@@ -215,5 +215,103 @@ https://leetcode.com/problems/subsets-ii/
          dfs(t, i + 1, nums);
          t.remove(t.size() - 1);
      }
+ }
+```
+
+# Path in Grid 系列
+## 329. Longest Increasing Path in a Matrix
+https://leetcode.com/problems/longest-increasing-path-in-a-matrix/
+
+在 matrix 中找 longest path, 方法 DFS + memo. 核心在于 memo 的记忆内容:    
+存到当前节点为止的 max length path.    
+转移时使用: Math.max(memo[i][j], 1 + dfs());
+
+```java
+ int res = 0;
+ int[][] memo;
+ 
+ public int longestIncreasingPath(int[][] matrix) {
+     int n = matrix.length, m = matrix[0].length;
+     memo = new int[n][m];
+     for(int[] mem : memo){
+         Arrays.fill(mem, -1);
+     }
+     
+     for(int i = 0; i < n; i++){
+         for(int j = 0; j < m; j++){
+             res = Math.max(res, dfs(matrix, i, j));
+         }
+     }
+     
+     return res;
+ }
+ 
+ private int dfs(int[][] m, int i, int j){
+     if(memo[i][j] != -1){
+         return  memo[i][j];
+     }
+     memo[i][j] = 1;
+     if(i - 1 >= 0 && m[i][j] < m[i-1][j]){
+         memo[i][j] = Math.max(memo[i][j], 1 + dfs(m, i-1, j));
+     }
+     if(j - 1 >= 0 && m[i][j] < m[i][j-1]){
+         memo[i][j] = Math.max(memo[i][j], 1 + dfs(m, i, j-1));
+     }
+     if(i + 1 < m.length && m[i][j] < m[i+1][j]){
+         memo[i][j] = Math.max(memo[i][j], 1 + dfs(m, i+1, j));
+     }
+     if(j + 1 < m[0].length && m[i][j] < m[i][j+1]){
+         memo[i][j] = Math.max(memo[i][j], 1 + dfs(m, i, j+1));
+     }
+     return memo[i][j];
+ }
+```
+
+## 2328. Number of Increasing Paths in a Grid
+https://leetcode.com/problems/number-of-increasing-paths-in-a-grid/
+
+方法同上, memo + DFS, 但是 memo 记录所有 valid path 的总数
+
+```java
+ final static int MOD = 1000000007;
+ int res = 0;
+ int[][] memo;
+ 
+ public int countPaths(int[][] grid) {
+     int m = grid.length, n = grid[0].length;
+     if(m == 0 || grid == null)  return res;
+     
+     memo = new int[m][n];
+     for(int[] mem : memo){
+         Arrays.fill(mem, -1);
+     }
+     
+     for(int i = 0; i < m; i++){
+         for(int j = 0; j < n; j++){
+             res = (res + dfs(grid, i, j)) % MOD;
+         }
+     }
+     return res;
+ }
+ 
+ private int dfs(int[][] grid, int i, int j){
+     if(memo[i][j] != -1){
+         return memo[i][j];
+     }
+     memo[i][j] = 1;
+     
+     if(i - 1 >= 0 && grid[i][j] < grid[i - 1][j]) 
+         memo[i][j] = (memo[i][j] + dfs(grid, i - 1, j)) % MOD;
+     
+     if(j - 1 >= 0 && grid[i][j] < grid[i][j - 1]) 
+         memo[i][j] = (memo[i][j] + dfs(grid, i, j - 1)) % MOD;
+     
+     if(i + 1 < grid.length && grid[i][j] < grid[i + 1][j]) 
+         memo[i][j] = (memo[i][j] + dfs(grid, i + 1, j)) % MOD;
+     
+     if(j + 1 < grid[0].length && grid[i][j] < grid[i][j + 1]) 
+         memo[i][j] = (memo[i][j] + dfs(grid, i, j + 1)) % MOD;
+     
+     return memo[i][j];
  }
 ```

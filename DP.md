@@ -929,3 +929,65 @@ dp[i][j] = dp[i-1][j] && s1.charAt(i-1) == s3.charAt(i+j-1) || dp[i][j-1] && s2.
      return dp[n][m];
  }
 ```
+
+## 376. Wiggle Subsequence
+https://leetcode.com/problems/wiggle-subsequence/
+
+先求导数, 然后设置两种状态: 增加, 减少, 跟据 增加 和 减少 的转移即可
+
+```java
+ public int wiggleMaxLength(int[] nums) {
+     if(nums.length == 1)    return 1;
+     
+     int n = nums.length;
+     int[] diff = new int[n - 1];
+     for(int i = 1; i < n; i++){
+         diff[i-1] = nums[i] - nums[i-1];
+     }
+     // DP
+     // dp[i+1][0] = Math.max(dp[i][0], dp[i][1] + 1) if diff[i] > 0
+     // dp[i+1][1] = Math.max(dp[i][1], dp[i][0] + 1) if diff[i] < 0
+     int[][] dp = new int[n-1][2];
+     dp[0][0] = diff[0] > 0 ? 1 : 0;
+     dp[0][1] = diff[0] < 0 ? 1 : 0;
+     for(int i = 1; i < n-1; i++){
+         if(diff[i] > 0){
+             dp[i][0] = Math.max(dp[i-1][0], dp[i - 1][1] + 1);
+             dp[i][1] = dp[i - 1][1];
+         }else if(diff[i] < 0){
+             dp[i][1] = Math.max(dp[i-1][1], dp[i - 1][0] + 1);
+             dp[i][0] = dp[i - 1][0];
+         }else{
+             dp[i][0] = dp[i - 1][0];
+             dp[i][1] = dp[i - 1][1];
+         }
+     }
+     return Math.max(dp[n-2][0], dp[n-2][1]) + 1;
+ }
+```
+## 2327. Number of People Aware of a Secret
+https://leetcode.com/problems/number-of-people-aware-of-a-secret/
+
+top-down DP, 从 Day0 开始, 记录 on each day 知道的人数 dp[i] = sum, sum 范围: [i-forget, i-delay], 在 超过 forget 的时候把 dp[i-forget] 的人数清空即可 
+
+```java
+ final static int MOD = 1000000007;
+ 
+ public int peopleAwareOfSecret(int n, int delay, int forget) {
+     int[] dp = new int[n+1];
+     dp[1] = 1;
+     for(int i = 2; i <= n; i++){
+         if(i > forget)   dp[i - forget] = 0;
+         int sum = 0;
+         for(int j = Math.max(0, i - forget); j <= i - delay; j++){
+             sum = (sum + dp[j]) % MOD;
+         }
+         dp[i] = sum;
+     }
+     int res = 0;
+     for(int num : dp){
+         res = (res + num) % MOD;
+     }
+     return res;
+ }
+```

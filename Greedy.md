@@ -201,3 +201,68 @@ public boolean checkPossibility(int[] nums) {
    return count <= 1;
 }
 ```
+
+## 1647. Minimum Deletions to Make Character Frequencies Unique
+https://leetcode.com/problems/minimum-deletions-to-make-character-frequencies-unique/
+
+统计 freq + HashSet 记录出现的次数 + 如果出现过, 则减去 1 直到没出现过
+
+```java
+ public int minDeletions(String s) {
+     int[] freq = new int[26];
+     for(char c : s.toCharArray())   freq[c-'a']++;
+     Set<Integer> used = new HashSet<>();
+     int res = 0;
+     for(int i = 0; i < 26; i++){
+         int f = freq[i];
+         while(f > 0){
+             if(!used.contains(f)){
+                 used.add(f);
+                 break;
+             }
+             f--;
+             res++;
+         }
+     }
+     return res;
+ }
+```
+
+## 406. Queue Reconstruction by Height
+https://leetcode.com/problems/queue-reconstruction-by-height/
+
+概念: 找到没有冲突的一组, 则其相对位置是固定. 实现: 
+1. 找到身高最高的一组, 他们和后续的没有冲突, 把他们的相对位置固定后, 再用身高较低的进行同样的循环.
+2. 首先对身高的 和 前面的人排序, 如果身高不同, 身高降序; 否则按照 前面的人 升序 排序
+
+```java
+ public int[][] reconstructQueue(int[][] people) {
+     // pq sorted by the HEIGHT desecnding order; FRONT ascending order
+     Arrays.sort(people, (o1, o2) -> o1[0] - o2[0] == 0 ? o1[1] - o2[1]: o2[0] - o1[0]);
+     // 7,0  7,1  6,1  5,0  5,2  4,4
+     LinkedList<int[]> res = new LinkedList<>();
+     for(int[] p : people)   res.add(p[1], p);
+     return res.toArray(new int[people.length][2]);
+ }
+```
+## 134. Gas Station
+https://leetcode.com/problems/gas-station/
+
+计算差值的同时, 维护一个 sum, 作为 preffix Sum, 验证到 i 为止, 是否可行; 不可行, 则 start = i + 1, sum = 0, 重新计数
+
+```java
+ public int canCompleteCircuit(int[] gas, int[] cost) {
+     int n = gas.length;
+     int sum = 0, tot = 0, start = 0;;
+     for(int i = 0; i < n; i++){
+         int dif = gas[i] - cost[i];
+         tot += dif;
+         sum += dif;
+         if(sum < 0){
+             start = i + 1;
+             sum = 0;
+         }
+     }
+     return tot < 0 ? -1 : start;
+ }
+```

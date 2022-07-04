@@ -86,3 +86,41 @@ public int minimumNumbers(int num, int k) {
   return -1;
 }
 ```
+
+462. Minimum Moves to Equal Array Elements II
+https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii/
+
+一般有三种中间值的找法: mean median mode, 但是所有的找法都需要计算 x, where nums[i] <= x <= nums[j], && i == n - j    
+从 nums[i] 到 x 的距离计算就是: count += abs(nums[i] - x)    
+如果此时同时取得两个
+
+```java
+public int minMoves2(int[] nums) {
+  Arrays.sort(nums);
+  int res = 0, left = 0, right = nums.length - 1;
+  while(left < right){
+      res += nums[right--] - nums[left++];
+  }
+  return res;
+}
+```
+
+## 453. Minimum Moves to Equal Array Elements
+https://leetcode.com/problems/minimum-moves-to-equal-array-elements/
+
+可以用迭代的办法解决, 但是O(NlogN), 从 sum 出发, 可以推出来计算公式, 如下
+
+```java
+public int minMoves(int[] nums) {
+   // sum + m * (n-1) = x * n
+   // x = min + m
+   // sum + m(n-1) = (min+m)n
+   // sum - m = min * n -> m = sum - min * n
+   int sum = 0, min = nums[0], n = nums.length;
+   for(int num : nums){
+       sum += num;
+       min = Math.min(min, num);
+   }
+   return sum - min * n;
+}
+```

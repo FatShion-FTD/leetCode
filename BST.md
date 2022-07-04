@@ -5,6 +5,8 @@
 ## Traverse 总结
 ### 不管对于 iteration 还是 recursion 实现, 都要意识到一点: 那就是在探索完毕后, 其实还有一个返回的过程, 我们对于 node 的访问, 除了 preOrder, 都应在返回的路上完成.对于 iteration, 返回过程是在 node == null 时; 对于recursion, 返回在每次递归调用之后.
 
+### 层序遍历和别的遍历变种, 根据情况使用 Queue 或者 Stack. 如层序遍历, 记录queue 的 size 作为当前行 poll 的数目即可
+
 144. Binary Tree Preorder Traversal: https://leetcode.com/problems/binary-tree-preorder-traversal/
 
 前序访问, 迭代DFS实现: 左 中 右, 在所有左探的路上记录 val

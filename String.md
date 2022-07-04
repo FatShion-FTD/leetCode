@@ -333,3 +333,71 @@ private String buildAbbr(String s, int k){
   return sb.toString();
 }
 ```
+
+## 395. Longest Substring with At Least K Repeating Characters
+https://leetcode.com/problems/longest-substring-with-at-least-k-repeating-characters/
+
+1. 用 freq < k 的 invalid char 作为隔断
+2. 在第一次 invalid 时, 递归进入 subString(left, right); 其余时候, right += 1
+
+```java
+public int longestSubstring(String s, int k) {
+  char[] arr = s.toCharArray();
+  
+  int[] freq = new int[26];
+  for(int i = 0; i < arr.length; i++){
+      freq[arr[i] - 'a'] += 1;
+  }
+  
+  boolean isComp = true;
+  for(int i = 0; i < arr.length; i++){
+      int f = freq[arr[i] - 'a'];
+      if( f > 0 && f < k){
+          isComp = false;
+          break;
+      }
+  }
+  if(isComp)  return s.length();
+  
+  int res = 0, left = 0, right = 0;
+  while(right < arr.length){
+      if(freq[arr[right] - 'a'] < k){
+          res = Math.max(res, longestSubstring(s.substring(left, right), k));
+          left = right + 1;
+      }
+      right++;
+  }
+  res = Math.max(res, longestSubstring(s.substring(left), k));
+  return res;
+}
+```
+
+# Rolling Hash 滚动 Hash 
+滚动hash算法, 首先是 Hash, 对一个 subarray 进行编码, 编辑成一个Integer, 用于判断 Collision; 在一般 Hash 的基础上, rolling hash 能够使用之前的 hash 信息:     
+Sub1 = num[i] * 10^2 + num[i+1] * 10^1 + num[i+2] * 10^0     
+Sub2 = (Sub1 - num[i] * 10^2) * 10 + num[i+3] * 10^0    
+collision 是不能避免的, 上述例子, base 是 10, base 取值要注意
+
+## 187. Repeated DNA Sequences
+https://leetcode.com/problems/repeated-dna-sequences/
+
+```java
+public List<String> findRepeatedDnaSequences(String s) {
+   int cur = 0, shift = (int)Math.pow(7, 9);
+   Set<String> res = new HashSet<>();
+   Set<Integer> set = new HashSet<>();
+   Map<Character, Integer> map = new HashMap<>();
+   map.put('A', 0);    map.put('C', 1);    map.put('G', 2);    map.put('T', 3);
+
+   for(int i = 0; i < s.length(); i++){
+      if(i > 9)   
+          cur -= shift * map.get(s.charAt(i - 10));
+      cur = cur * 7 + map.get(s.charAt(i));
+      if(i > 8 && !set.add(cur)){
+          res.add(s.substring(i-9,i+1));
+      }  
+   }
+
+   return new ArrayList<>(res);
+}
+```
