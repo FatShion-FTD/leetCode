@@ -4,15 +4,19 @@ class UnionFind {
     private int[] root;
     // Use a rank array to record the height of each vertex, i.e., the "rank" of each vertex.
     private int[] rank;
+    // count the size of each component
+    private int[] size;
     private int count;
 
     public UnionFind(int size) {
         root = new int[size];
         rank = new int[size];
+        this.size = new int[size];
         count = size;
         for (int i = 0; i < size; i++) {
             root[i] = i;
             rank[i] = 0; 
+            this.size[i] = 1;
         }
     }
 	// The find function here is the same as that in the disjoint set with path compression.
@@ -23,7 +27,7 @@ class UnionFind {
         return root[x] = find(root[x]);
     }
 	// The union function with union by rank
-    public void union(int x, int y) {
+    public int union(int x, int y) {
         int rootX = find(x);
         int rootY = find(y);
         if (rootX != rootY) {
@@ -34,9 +38,12 @@ class UnionFind {
             } else {
                 root[rootY] = rootX;
                 rank[rootX] += 1;
+                // Update the size of the component by adding the size of subcomponent.
+                size[rootX] += size[rootY];
             }
             count--;
         }
+        return size[rootX];
     }
     public boolean connected(int x, int y) {
         return find(x) == find(y);
@@ -249,4 +256,42 @@ https://leetcode.com/problems/count-unreachable-pairs-of-nodes-in-an-undirected-
         }
         return res/2;
     }
+```
+## 128. Longest Consecutive Sequence
+https://leetcode.com/problems/longest-consecutive-sequence/
+
+把连续的 sequence 当作 disjoint component, 使用 MAP 记录 <num, index> 其中 index 表示 num 在数组中的位置, 使用 UnionFind 记录连通分量, 通过魔改 UnionFind 的 Union 函数 + 加以 size 变量, 可以让其记录连通分量的大小
+
+
+```java
+public int longestConsecutive(int[] nums) {
+   if(nums.length <= 1)    return nums.length;
+   
+   UnionFind uf = new UnionFind(nums.length);
+   Map<Integer, Integer> map = new HashMap<>();
+   int max = 1;
+   for(int i = 0; i < nums.length; i++){
+       int num = nums[i], left = num - 1, right = num + 1;;
+       if(map.containsKey(num))    continue;
+
+       if(map.containsKey(left))
+           max = Math.max(max, uf.union(i, map.get(left)));
+       
+       if(map.containsKey(right))
+           max = Math.max(max, uf.union(i, map.get(right)));
+       
+       map.put(num, i);
+   }
+   
+   return max;
+}
+// 魔改 UNION
+public int union(int x, int y){
+    int pX = find(x), pY = find(y);
+    if(pX != pY){
+        p[pY] = pX;
+        size[pX] += size[pY];
+    }
+    return size[pX];
+}
 ```

@@ -59,8 +59,17 @@ public int primAlgo(int[][] edges, int start) {
 
 
 ## Kruskal 算法
+类似 UnionFind 的思想, 时间复杂度: O(E logE).
+1. 创建Graph, 有 v 个顶点, e 个边, 将所有 edge 从小打到 sort
+2. 维持 UF 计算连通分量, 从 val 最小的 edge 开始, 如果两个 vec 的连通分量不同, 则加入到最小生成树中.
+3. 直到所有 vec 在同一个连通分量中
+
+```java
+
+```
 
 
+# Problems
 1584. Min Cost to Connect All Points: https://leetcode.com/problems/min-cost-to-connect-all-points/
 
 构建邻接矩阵 或者 邻接表 套用算法即可

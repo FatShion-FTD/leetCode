@@ -213,10 +213,63 @@ public int minEatingSpeed(int[] nums, int h) {
 }
 ```
 
+## 2333. Minimum Sum of Squared Difference
+
+K次操作后, 平方差最小 = 找到一个值, 把大于这个值的都砍到这个值, 同时砍的总数小于K. 使用二分再上下界中找到这个值, 同样属于隐藏了上下界的二分, 特殊点: 
+1. diff = 0 是最优状态, 一旦到 0, 停止所有对该值的操作
+2. 如果操作数有剩余, 只针对砍了的数进行额外的逐个 -1, 原因:    
+如果所有大于 mid 的值都能被-1, 且还有剩余则证明, 二分时候的 mid 还可以更小, 所以只需要对 == mid 的 -1, 不会有额外的情况
+
+```java
+public long minSumSquareDiff(int[] nums1, int[] nums2, int k1, int k2) {
+    int n = nums1.length, tot = k1 + k2;
+    long[] diff = new long[n];
+    
+    
+    for (int i = 0; i < n; i++) {
+        diff[i] = (long)Math.abs(nums1[i] - nums2[i]);
+    }
+    
+    int left = 0, right = 100001;
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        int t = 0;
+        
+        for (int i = 0; i < n && t <= tot; i++) {
+            if(mid < diff[i])
+                t += (diff[i] - mid);
+        }
+        
+        if (t > tot){
+            left = mid + 1;
+        }else{
+            right = mid;
+        }
+    }
+    
+    for (int i = 0; i < n; i++) {
+        if(left <= diff[i]){
+            tot -= (diff[i] - left);
+            diff[i] = left;
+        }
+    }
+    
+    long res = 0;
+    for(int i = 0; i < n; i++) {
+        if(diff[i] == left && tot > 0 && left != 0){
+            diff[i]--;
+            tot--;
+        }
+        res += diff[i] * diff[i];
+    }
+    
+    return res;
+}
+```
 
 
-
-Split Array Largest Sum: https://leetcode.com/problems/split-array-largest-sum/
+## Split Array Largest Sum
+https://leetcode.com/problems/split-array-largest-sum/
 
 上界: 数组和(m=1), 下界: 最大数组(m=n), high = 上界, low = 下界, 二分搜索可能值范围
 
@@ -249,7 +302,8 @@ public int splitArray(int[] nums, int m) {
 }
 ```
 
-69. Sqrt(x): https://leetcode.com/problems/sqrtx/
+## 69. Sqrt(x)
+https://leetcode.com/problems/sqrtx/
 
 经典题目: 二分搜索, 但是trick: 因为返回 floor(sqrt) 的 int, 所以 
 x >= i * i && x < (i+1)(i+1). 并且 使用 i < x / i 避免越界

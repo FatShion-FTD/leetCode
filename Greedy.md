@@ -266,3 +266,36 @@ https://leetcode.com/problems/gas-station/
      return tot < 0 ? -1 : start;
  }
 ```
+
+## 2332. The Latest Time to Catch a Bus
+https://leetcode.com/problems/the-latest-time-to-catch-a-bus/
+
+要上车时间最晚, 就贪心两种情况, 在一个人前面上车 或者 卡点上车. 用 set 存无效的上车时间, 然后在和每个人抢座, 最后如果还有位置, 则卡点上车
+
+```java
+ public int latestTimeCatchTheBus(int[] buses, int[] passengers, int capacity) {
+     // 2 situation: if not max, arrive at current bus departure time
+     // if max, get to the latest time point, passengers[p] - 1
+     Set<Integer> set = new HashSet<>();
+     int res = 0;
+     for (int p : passengers) 
+         set.add(p);                                 // use for checking passengers[p] - 1 is valid
+     
+     Arrays.sort(buses);
+     Arrays.sort(passengers);
+     for (int i = 0, j = 0; i < buses.length; i++) { // i - bus index, j - passenager index
+         int cnt = 0;
+         while(cnt < capacity && j < passengers.length && passengers[j] <= buses[i]) {
+             if (!set.contains(passengers[j] - 1))
+                 res = Math.max(res, passengers[j] - 1);
+             cnt++;
+             j++;
+         }
+         if(cnt < capacity && !set.contains(buses[i]))
+             res = Math.max(res, buses[i]);
+     }
+     
+     return res;
+ }
+```
+

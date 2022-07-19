@@ -315,3 +315,77 @@ https://leetcode.com/problems/number-of-increasing-paths-in-a-grid/
      return memo[i][j];
  }
 ```
+
+## 698. Partition to K Equal Sum Subsets
+https://leetcode.com/problems/partition-to-k-equal-sum-subsets/    
+同款题目, 473. Matchsticks to Square     
+https://leetcode.com/problems/matchsticks-to-square/
+
+DFS直接应用即可, 但是使用DFS在回溯时候, 有2个 trick 加速, 不然会TLE:
+1. 针对越界情况, 如果从 较大数字 进行反向遍历, 则可以快速退出
+2. sort 后跳过相同元素 进行剪枝, 和 subset 2 类似
+
+```java
+ public boolean canPartitionKSubsets(int[] nums, int k) {
+     int sum = 0;
+     for(int stick : nums){
+         sum += stick;
+     }
+     if(sum % k != 0)    return false;
+     Arrays.sort(nums);
+     
+     return dfs(nums, new int[k], nums.length - 1, sum / k);
+ }
+ 
+ private boolean dfs(int[] nums, int[] lens, int index, int target){
+     if(index == -1)
+         return true;
+     
+     int stick = nums[index];
+     for(int j = 0; j < lens.length; j++){
+         if(lens[j] + stick > target || (j > 0 && lens[j] == lens[j-1])) 
+             continue;
+         lens[j] += stick;
+         if(dfs(nums, lens, index - 1, target))   
+             return true;
+         lens[j] -= stick;
+     }
+     return false;
+ }
+```
+## 576. Out of Boundary Paths
+https://leetcode.com/problems/out-of-boundary-paths/
+
+3维记忆 + DFS. 两点: 
+1. 3维记忆, row index, col index 和 剩余move
+2. 注意记忆初始化, 一定要初始化为 -1, 因为初始化为0, 有些edge case计算后的值就是0, 会出现重复计算
+
+```java
+ static int MOD = 1000000007;
+
+ public int findPaths(int m, int n, int max, int row, int col) {
+     int[][][] dp = new int[m][n][max + 1];
+     for(int[][] arr1 : dp)
+         for(int[] arr : arr1)
+             Arrays.fill(arr, -1);
+     
+     return dfs(dp, m, n, max, row, col);
+ }
+ 
+ private int dfs(int[][][] dp, int m, int n, int max, int row, int col){
+     if(max < 0)
+         return 0;
+     if(row < 0 || row == m || col < 0 || col == n)
+         return 1;
+     if(dp[row][col][max] != -1)
+         return dp[row][col][max];
+     
+     int res = 0;
+     res = (res + dfs(dp, m, n, max - 1, row + 1, col)) % MOD;
+     res = (res + dfs(dp, m, n, max - 1, row - 1, col)) % MOD;
+     res = (res + dfs(dp, m, n, max - 1, row, col + 1)) % MOD;
+     res = (res + dfs(dp, m, n, max - 1, row, col - 1)) % MOD;
+     dp[row][col][max] = res;                 
+     return res;         
+ }
+```

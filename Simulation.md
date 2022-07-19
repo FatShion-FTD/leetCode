@@ -150,3 +150,30 @@ public void setZeroes(int[][] matrix) {
     return;
 }
 ```
+
+## 2343. Query Kth Smallest Trimmed Number
+https://leetcode.com/problems/query-kth-smallest-trimmed-number/
+
+直接模拟, + 使用 Pair<> 实现多态的比较 + Map 去除重复计算
+
+```java
+public int[] smallestTrimmedNumbers(String[] strs, int[][] q) {
+    int[] res = new int[q.length];
+    Map<Integer, List<Pair<String, Integer>>> map = new HashMap<>();
+    
+    for(int i = 0; i < q.length; i++){
+        if(!map.containsKey(q[i][1])){
+            List<Pair<String, Integer>> list = new ArrayList<>();
+            for (int j = 0; j < strs.length; j++) {
+                list.add(new Pair(strs[j].substring(strs[j].length() - q[i][1]), j));
+            }
+            Collections.sort(list, (a, b) -> a.getKey().compareTo(b.getKey()));
+            map.put(q[i][1], list);
+        }
+        
+        res[i] = map.get(q[i][1]).get(q[i][0] - 1).getValue();
+    }
+    
+    return res;
+}
+```

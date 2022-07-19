@@ -339,3 +339,38 @@ public List<Integer> minAvailableDuration(int[][] slots1, int[][] slots2, int du
     return res;
 }
 ```
+## 2337. Move Pieces to Obtain a String
+https://leetcode.com/problems/move-pieces-to-obtain-a-string/
+
+双指针作为 index + 双向check. 注意相对位置是否有效, 在反向check时候, 条件相反.
+
+```java
+public boolean canChange(String s, String t) {        
+    return helper(s, t, false) && helper(t, s, true);
+}
+
+private boolean helper(String s, String t, boolean reverse){
+    for(int i = 0, j = 0; i < s.length(); i++){
+        if(s.charAt(i) == '_')  continue;
+        char sp = s.charAt(i);
+        while(j < t.length() && t.charAt(j) == '_'){
+            j++;
+        }
+        
+        if(reverse){
+            if(j == t.length() || sp != t.charAt(j) ||
+                sp == t.charAt(j) && sp == 'L' && j < i ||
+                sp == t.charAt(j) && sp == 'R' && j > i)
+                return false;
+        }else{
+            if(j == t.length() || sp != t.charAt(j) ||
+                sp == t.charAt(j) && sp == 'L' && j > i ||
+                sp == t.charAt(j) && sp == 'R' && j < i)
+                return false;
+        }
+        
+        j++;
+    }
+    return true;
+}
+```

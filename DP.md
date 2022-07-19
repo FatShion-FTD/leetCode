@@ -230,7 +230,9 @@ public int minCostClimbingStairs(int[] cost) {
 }
 ```
 
-Jump Game: https://leetcode.com/problems/jump-game/
+# Jump Game 系列
+## Jump Game
+https://leetcode.com/problems/jump-game/
 
 转移函数: $F[i] = true$ if $F[j] == true,F[j] + j >= i$ for $j < i$
 ```java
@@ -264,7 +266,8 @@ public boolean canJump(int[] nums) {
 }
 ```
 
-Jump Game II: https://leetcode.com/problems/jump-game-ii/
+## Jump Game II
+https://leetcode.com/problems/jump-game-ii/
 
 转移函数: $dp[j] = min(dp[i] + 1, dp[j])$ where $j = i+1$ 且 $j < N[i] + i + 1$
 
@@ -296,6 +299,36 @@ public int jump(int[] nums) {
     }
     return j;
 }
+```
+
+## 1696. Jump Game VI
+https://leetcode.com/problems/jump-game-vi/
+
+DP + mono-queue, 核心在于使用单调队列维护最大值 且 及时更新.    
+mono-queue 储存 index, queue的首 存储最大值, 尾存储最小值;    
+MONO: 每次加入前, 去掉所有比 当前小的 值.    
+判读是否越界, 拿 队首的 index, 和当前 index 比较即可.
+
+```java
+ public int maxResult(int[] nums, int k) {
+     int n = nums.length;
+     if(n == 0 || nums == null)  return 0;
+     
+     Deque<Integer> deque = new ArrayDeque<>();
+     deque.offer(0);
+     for(int i = 1; i < n; i++){
+         nums[i] += nums[deque.peekFirst()];
+         // make queue only maintain vals greater than nums[i]
+         while(!deque.isEmpty() && nums[deque.peekLast()] <= nums[i])
+             deque.pollLast();
+         // add cur index to queue
+         deque.offer(i);
+         // if max val index is no longer valid, poll
+         if(i - deque.peekFirst() >= k)
+             deque.pollFirst();
+     }
+     return nums[n-1];
+ }
 ```
 
 Maximum Subarray: https://leetcode.com/problems/maximum-subarray/
@@ -930,6 +963,35 @@ dp[i][j] = dp[i-1][j] && s1.charAt(i-1) == s3.charAt(i+j-1) || dp[i][j-1] && s2.
  }
 ```
 
+从表可以看出, DP 只和上一 row 有关, 所以去掉一维, 成为1维DP.    
+DP[j]存的实际就是上一行的信息.
+
+```java
+ public boolean isInterleave(String s1, String s2, String s3) {
+     int n = s1.length(), m = s2.length(), l = s3.length();
+     if(n + m != l)  return false;
+     
+     boolean[] dp = new boolean[m+1];
+     for(int i = 0; i <= n; i++){
+         for(int j = 0; j <= m; j++){
+             if(i == 0 && j == 0){
+                 dp[0] = true;
+             }else if(i == 0){
+                 // 1st row in table, only matching the charAt j and previous state j-1
+                 dp[j] = dp[j-1] && s2.charAt(j-1) == s3.charAt(i+j-1);    
+             }else if(j == 0){
+                 // 1st col in table, dp[j] store the info from last row and only match s1.
+                 dp[j] = dp[j] && s1.charAt(i-1) == s3.charAt(i+j-1);
+             }else{
+                 dp[j] = dp[j] && s1.charAt(i-1) == s3.charAt(i+j-1) || 
+                     dp[j-1] && s2.charAt(j-1) == s3.charAt(i+j-1);  
+             }
+         }
+     }
+     return dp[m];
+ }
+```
+
 ## 376. Wiggle Subsequence
 https://leetcode.com/problems/wiggle-subsequence/
 
@@ -990,4 +1052,154 @@ top-down DP, 从 Day0 开始, 记录 on each day 知道的人数 dp[i] = sum, su
      }
      return res;
  }
+```
+
+## 264. Ugly Number II
+https://leetcode.com/problems/ugly-number-ii/
+
+记录 2 3 5 三个的对应最小丑数 index 进行 DP 转移即可
+
+```java
+ public int nthUglyNumber(int n) {
+     int[] ugly = new int[n];
+     int index2 = 0, index3 = 0, index5 = 0, min;
+     ugly[0] = 1;
+     
+     for(int i = 1; i < n; i++){
+         min = Math.min(ugly[index2] * 2, 
+            Math.min(ugly[index3] * 3, ugly[index5] * 5));
+         ugly[i] = num;
+         if(min == mul2)    index2++;
+         if(min == mul3)    index3++;
+         if(min == mul5)    index5++;
+     }
+     return ugly[n-1];
+ }
+```
+
+# Paint House 系列
+## 256. Paint House
+https://leetcode.com/problems/paint-house/    
+
+直接 2维DP 即可, i 的最小 cost 是 当前paint cost + 其余两种颜色的最小 paint cost at i-1
+
+```java
+ public int minCost(int[][] costs) {
+     // min cost at i-th house while painting in color 0-2. 
+     // dp[i][3]
+     int n = costs.length;
+     int[][] dp = new int[n][3];
+     
+     for(int i = 0; i < 3; i++){
+         dp[0][i] = costs[0][i];
+     }
+     
+     // dp[i][0] = cost[i][0] + min(dp[i-1][1], dp[i-1][2]);
+     for(int i = 1; i < n; i++){
+         for(int j = 0; j < 3; j++){
+             dp[i][0] = costs[i][0] + Math.min(dp[i-1][1], dp[i-1][2]);
+             dp[i][1] = costs[i][1] + Math.min(dp[i-1][0], dp[i-1][2]);
+             dp[i][2] = costs[i][2] + Math.min(dp[i-1][1], dp[i-1][0]);
+         }    
+     }
+     
+     return Math.min(dp[n-1][0], Math.min(dp[n-1][1], dp[n-1][2]));
+ }
+```
+
+## 265. Paint House II
+https://leetcode.com/problems/paint-house-ii/
+
+
+
+## 1473. Paint House III
+https://leetcode.com/problems/paint-house-iii/
+
+三维DP
+
+```java
+class Solution {
+    int[] hs;
+    int[][] cs;
+    int m, n, t;
+    Integer[][][] dp;
+    public int minCost(int[] hs, int[][] cs, int m, int n, int target) {
+        this.hs = hs;
+        this.cs = cs;
+        this.m = m;
+        this.n = n;
+        t = target;
+        dp = new Integer[m + 1][t + 1][n + 2];
+        for (int i = 0; i <= n; i++) dp[m][0][i] = 0;
+        int res = dfs(0, t, n + 1);  //use a dummy color "n + 1" for a dummy house "-1"
+        return res < Integer.MAX_VALUE ? res : -1;
+    }
+    
+    // idx: current house index, rem: remaining target, c: current color
+    private int dfs(int idx, int rem, int c) {
+        if (rem >= 0 && dp[idx][rem][c] != null) return dp[idx][rem][c];    // memoization
+        int res = Integer.MAX_VALUE;
+        if (idx >= m || rem < 0) return rem == 0 ? 0 : res; // boundary condition
+        if (hs[idx] > 0) {                          // 当前房子 painted
+            int diff = (hs[idx] == c ? 0 : 1);      // 颜色不一样, 增加新的 neighbor
+            dp[idx][rem][c] = dfs(idx + 1, rem - diff, hs[idx]);
+            return dp[idx][rem][c];                 // 储存DP
+        }
+        for (int i = 1; i <= n; i++) {              // 按顺序上色
+            int diff = (i == c ? 0 : 1);            // 判断是否和上一个房子 same color, 增加新的 neighbor
+            int last = dfs(idx + 1, rem - diff, i); // 子状态的最小值
+            if (last < Integer.MAX_VALUE)           // 如果子状态有效, 则 res = min(res, cost+last)
+                res = Math.min(res, cs[idx][i - 1] + last);
+        }
+        dp[idx][rem][c] = res;                      // 储存DP
+        return res;
+    }
+}
+```
+
+## 629. K Inverse Pairs Array
+https://leetcode.com/problems/k-inverse-pairs-array/
+
+DP过程隐藏的比较深, 需要仔细去找, DP[n + 1][k + 1] 表示前 n 个数字中, 有 k 个反转对      
+当有 [1, n-1] 时, 把 n 放到最后面则是 完全继承了上一时刻的状态 dp[n-1][k];     
+把 n 放到倒数第二个位置, 则是继承了 dp[n-1][k-1], 因为此时 n 能提供 1 个反转对;     
+把 n 放到第一个位置, 则继承了 dp[n-1][k-(n-1)], 因为此时 n 能提供 n - 1个反转对;
+
+dp[n][k] = dp[n-1][k] + dp[n-1][k-1] + ... + dp[n-1][k-(n-1)]    
+dp[n][k+1] = dp[n-1][k+1] + dp[n-1][k] + ... + dp[n-1][k + 1 -(n-1)]    
+
+两式相减得到: dp[n][k+1] = dp[n][k]+dp[n-1][k+1]-dp[n-1][k+1-n]
+
+注意4点: 
+1. 起始状态为: 有两个数字 1 和 2, 反转 1 次和 0 次, 结果都是 1
+2. edge case: n * (n-1) / 2: 最大的反转对数, 注意不能超过最大反转对数
+3. i 从 3 开始, 因为前两个数字 是 base case
+4. 注意 MOD 会导致的可能负数, 在减法之后 (x + MOD) % MOD 保证正数
+
+```java
+static int MOD = 1000000007;
+
+public int kInversePairs(int n, int k) {
+   // k > n*(n-1)/2 表示反转对数 超过上限
+   if (k > n*(n-1)/2 || k < 0)                 
+      return 0;
+   // all pair反过来
+   if(k == 0 || k == n * (n - 1) / 2)          
+      return 1;
+
+   long[][] dp = new long[n + 1][k + 1];
+   dp[2][0] = 1;                               // 两个数字, 无反转 = 1 
+   dp[2][1] = 1;                               // 两个数字, 翻转一次 = 1
+   for (int i = 3; i <= n; i++) {
+      // dp[n][k+1] = dp[n][k]+dp[n-1][k+1]-dp[n-1][k+1-n] where i = n, j = k+1
+      dp[i][0] = 1;
+      for(int j = 1; j <= Math.min(k, i * (i - 1) / 2); j++){
+          dp[i][j] = (dp[i][j-1] + dp[i-1][j]) % MOD;
+          if(j >= i)  
+              dp[i][j] = (dp[i][j] - dp[i-1][j-i]) % MOD;     // may cause neg
+          dp[i][j] = (dp[i][j] + MOD) % MOD;
+      }
+   }
+   return (int) dp[n][k];
+}
 ```

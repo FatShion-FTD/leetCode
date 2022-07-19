@@ -278,3 +278,66 @@ public int trap(int[] height) {
   return res;
 }
 ```
+
+## 135. Candy
+https://leetcode.com/problems/candy/
+
+方法1: 同接雨水的两遍双向遍历, 但是此时条件为, 从左往右, 遇到更大的rating:    
+num[i+1] = num[i] + 1     
+从右往左, 则为遇到更大的rating, 要么保留原数目(> num[i] + 1), 要么+1:    
+num[i-1] = max(num[i-1], num[i] + 1)
+
+```java
+ public int candy(int[] ratings) {
+     int n = ratings.length;
+     int[] candies = new int[n];
+     Arrays.fill(candies, 1);
+     
+     for(int i = 0; i < n - 1; i++){
+         if(ratings[i] < ratings[i+1]){
+             candies[i+1] = candies[i] + 1;        
+         }
+     }
+     
+     for(int i = n - 1; i > 0; i--){
+         if(ratings[i] < ratings[i-1]){
+             candies[i-1] = Math.max(candies[i-1], candies[i] + 1);
+         }
+     }
+     int res = 0;
+     for(int num : candies)  res += num;
+
+     return res;
+ }
+```
+
+方法2, O(n) time + O(1) space. 核心三点:
+1. If rate[i] == rate[i+1], 则 num[i+1]可以置 1;
+2. If rate[i] < rate[i+1], 则 num[i+1] = num[i] + 1, 并不是强制 + 1, 可以比 num[i] 大很多;
+3. If rate[i] > rate[i+1], 因为不知道 连续下降的次数, 可能最后的人是 -1, 所以记录连续下降的次数, 山谷为1, 则其为长度为 cnt 的到 1 的等差数列和, cnt 和山顶的 pre 比较, 判断山顶元素是否大于 cnt, 补齐 cnt - pre + 1即可 
+
+```java
+ public int candy(int[] ratings) {
+     int n = ratings.length;
+     int cnt = 0, pre = 1, res = 1;
+     for(int i = 1; i < n; i++){
+         if(ratings[i] >= ratings[i-1]){
+             if(cnt > 0){    // 结束单减
+                 res += cnt * (cnt + 1) / 2; // 从1到 n 的cnt长等差数列和
+                 if(cnt >= pre)  res += cnt - pre + 1;   // 补齐
+                 cnt = 0;
+                 pre = 1;
+             }
+             pre = ratings[i] == ratings[i-1] ? 1 : pre + 1; // 如果相等, 直接置1
+             res += pre;
+         }else{
+             cnt++;
+         }
+     }
+     if(cnt > 0){
+         res += cnt * (cnt + 1) / 2;
+         if(cnt >= pre)  res += cnt - pre + 1;
+     }
+     return res;
+ }
+```

@@ -472,3 +472,35 @@ public TreeNode invertTree(TreeNode root) {
   return root;
 }
 ```
+## 109. Convert Sorted List to Binary Search Tree
+https://leetcode.com/problems/convert-sorted-list-to-binary-search-tree/
+
+利用 DFS 的特性, 递归寻找左子树, 直到最左节点, 找到后在回溯阶段使用 链表 的next, 在父调用中完成 **全局变量 node 的更新**
+
+```java
+private ListNode node;
+public TreeNode sortedListToBST(ListNode head) {
+  if(head == null)    return null;
+  node = head;
+  int size = 0;
+  while(head != null){
+      head = head.next;
+      size++;
+  }
+  return helper(0, size - 1);
+}
+
+private TreeNode helper(int head, int tail){
+  if(head > tail)    return null;
+  
+  int mid = head + (tail - head) / 2;
+  // find left first
+  TreeNode left = helper(head, mid - 1);
+  TreeNode root = new TreeNode(node.val);
+  node = node.next;
+  TreeNode right = helper(mid + 1, tail);
+  root.left = left;
+  root.right = right;
+  return root;
+}
+```
