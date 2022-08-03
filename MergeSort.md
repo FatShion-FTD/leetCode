@@ -86,3 +86,12 @@ private ListNode mergeTwo(ListNode list1, ListNode list2){
     return dummy.next;
 }
 ```
+
+
+## 315. Count of Smaller Numbers After Self
+https://leetcode.com/problems/count-of-smaller-numbers-after-self/
+
+```java
+
+
+```

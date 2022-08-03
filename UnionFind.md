@@ -295,3 +295,39 @@ public int union(int x, int y){
     return size[pX];
 }
 ```
+
+## 236. Lowest Common Ancestor of a Binary Tree
+https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/
+
+树形 UnionFind, 使用 Map 记录 <node, parent> 根据 parent map 构建路径, 取公共节点
+
+```java
+public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+   Map<TreeNode, TreeNode> map = new HashMap<>();
+   Deque<TreeNode> stack = new ArrayDeque<>();
+   stack.push(root);
+   
+   while(!stack.isEmpty()) {
+       TreeNode node = stack.pop();
+       if (node.left != null) {
+           map.put(node.left, node);
+           stack.push(node.left);
+       }
+       if (node.right != null) {
+           map.put(node.right, node);
+           stack.push(node.right);
+       }
+   }
+   Set<TreeNode> set = new HashSet<>();
+   while (p != null) {
+       set.add(p);
+       p = map.getOrDefault(p, null);
+   }
+   while (q != null) {
+       if (set.contains(q))
+           return q;
+       q = map.getOrDefault(q, null);
+   }
+   return null;
+}
+```

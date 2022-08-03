@@ -327,3 +327,106 @@ public int mySqrt(int x) {
     return lo;
 }
 ```
+
+## 315. Count of Smaller Numbers After Self
+https://leetcode.com/problems/count-of-smaller-numbers-after-self/
+
+倒序遍历, 构建 sorted list, 跟据插入位置, 判断插入位置前的数字个数, 使用 binarysearch 查找插入位置.     
+Collections.binarysearch(list, nums[i]) 返回: 如果存在, 则返回 >= 0 的位置; 如果不存在, 则返回 - index - 1, index 是插入位置
+
+```java
+public List<Integer> countSmaller(int[] nums) {
+     LinkedList<Integer> res = new LinkedList<>();
+     // sorted list
+     List<Integer> list = new ArrayList<>();                         
+     
+     if (nums == null || nums.length == 0)
+         return res;
+     
+     res.add(0);        // the last element
+     list.add(nums[nums.length - 1]);
+     
+     for (int i =  nums.length - 2; i >= 0; i--) {
+        // find the first index > nums[i]
+         int index = Collections.binarySearch(list, nums[i]); 
+         
+         if (index >= 0) {
+            // 如果存在相同， 则找最靠前的index
+             while (index > 0 && list.get(index - 1) == nums[i]) {   
+                 index --;
+             }
+         } else {
+            // 如果插入位置是4， 则返回 -1-4 = -5, 倒推插入位置
+             index = -1 - index;                                     
+         }
+         // index 是插入位置, 同时也是小于nums[i]的数字个数
+         res.add(0, index);
+         list.add(index, nums[i]);
+     }
+     
+     return res;
+ }
+```
+
+## 240. Search a 2D Matrix II
+https://leetcode.com/problems/search-a-2d-matrix-ii/
+
+将 matrix 分为 4 部分, 每次二分去掉 target 不可能存在的部分, divide andd conquer 搜索其余 3 部分即可, 注意边界条件, 否则可能爆栈     
+最优解: 把这个 matrix 当作从右上角生成的一棵树, 跟据左右子树的值判断即可
+
+```java
+ public boolean searchMatrix(int[][] mat, int tar) {
+     int n = mat.length, m = mat[0].length;
+     return binarySearch(mat, tar, 0, n-1, 0, m-1);
+ }
+ 
+ private boolean binarySearch (int[][] mat, int tar, int startRow, int endRow, int startCol, int endCol) {
+     if (startRow > endRow || startCol > endCol)
+         return false;
+     
+     int midRow = startRow + (endRow - startRow) / 2;
+     int midCol = startCol + (endCol - startCol) / 2;
+     if (mat[midRow][midCol] == tar)
+         return true;
+
+     boolean res = false;
+     if (mat[midRow][midCol] < tar) {
+         res |= binarySearch(mat, tar, midRow + 1, endRow, midCol + 1, endCol) || 
+             binarySearch(mat, tar, startRow, midRow, midCol + 1, endCol) || 
+             binarySearch(mat, tar, midRow + 1, endRow, startCol, midCol);
+     } else if (mat[midRow][midCol] > tar) {           
+         res |= binarySearch(mat, tar, startRow, midRow - 1, startCol, midCol - 1) ||
+             binarySearch(mat, tar, startRow, midRow - 1, midCol, endCol) || 
+             binarySearch(mat, tar, midRow, endRow, startCol, midCol - 1);
+     }
+     return res;
+ }
+```
+
+# 二分区间查找
+## 658. Find K Closest Elements
+https://leetcode.com/problems/find-k-closest-elements/
+
+二分查找区间而不是 index 或者 某个值, 而是找一个范围, 这个范围由 arr[left] 到 arr[left + k] 构成, 对于这个范围, 跟据题目需求, 可以进行调整, 该题为 K 个最接近元素, 则寻找这个范围的 中值 midVal, midVal = arr[mid] + arr[mid + k], 如果中值小于 x, 则说明范围可以适当右移, left = mid, 类推
+
+```java
+ public List<Integer> findClosestElements(int[] arr, int k, int x) {
+     // find the nearest range [left, left + k], where its mid value is nearest to x 
+     int left = 0, right = arr.length - k;
+     while (left < right) {
+         int mid = left + (right - left) / 2;            // mid index between left, right
+         int rangeMid = arr[mid] + (arr[mid + k] - arr[mid]) / 2;   // mid value between the range arr[mid], arr[mid+k]
+         if (x > rangeMid) {                         // mid is at left of x
+             left = mid + 1;
+         } else {
+             right = mid;
+         }
+     }
+     
+     List<Integer> res = new ArrayList<>();
+     for (int i = left; i < left + k; i++) 
+         res.add(arr[i]);
+     
+     return res;
+ }
+```

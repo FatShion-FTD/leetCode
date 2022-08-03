@@ -1203,3 +1203,119 @@ public int kInversePairs(int n, int k) {
    return (int) dp[n][k];
 }
 ```
+
+
+# Max Rectangle 系列
+## 221. Maximal Square
+https://leetcode.com/problems/maximal-square/
+
+DP, 但是如何确定 正方形? 使用验证技巧 3 MIN:      
+DP[i][j] 记录 右下角在 i 和 j 位置的正方形的边长, 如果 DP[i-1][j], DP[i-1][j-1], DP[i][j-1] 均为正方形 (大于 1) , 则      
+DP[i][j] = min(DP[i-1][j], DP[i-1][j-1], DP[i][j-1]) + 1     
+意味继承最小的有效正方形边长
+
+```java
+ public int maximalSquare(char[][] matrix) {
+     // dp[i][j] - the side length of the matrix, which right-bot corner at [i, j]
+     int n = matrix.length, m = matrix[0].length;
+     int dp[][] = new int[n][m], res = 0;
+     
+     for (int i = 0; i < n; i++) {
+         for (int j = 0; j < m; j++) {
+             if (matrix[i][j] == '1') {
+                 dp[i][j] = Math.max(dp[i][j], 1 + Math.min(dp[Math.max(0, i-1)][j], 
+                                         Math.min(dp[Math.max(0, i-1)][Math.max(0, j-1)], 
+                                                  dp[i][Math.max(0, j-1)])));
+                 res = Math.max(dp[i][j], res);
+             }
+         }
+     }
+     return res * res;
+ }
+```
+
+## 85. Maximal Rectangle
+https://leetcode.com/problems/maximal-rectangle/
+
+```java
+
+
+```
+
+
+## 238. Product of Array Except Self
+https://leetcode.com/problems/product-of-array-except-self/
+
+虽然不是DP, 但是是下面那道题的思路, 使用 prefix 和 suffix 节省计算, 这里简化了 suffix, 采用 right 单独维持
+
+```java
+public int[] productExceptSelf(int[] nums) {
+    int n = nums.length;
+    int[] res = new int[n];
+    res[0] = 1;
+    for (int i = 1; i < n; i++) {       // calculate prefix
+        res[i] = nums[i-1] * res[i-1];
+    }
+    int right = 1;                      // maintain the suffix
+    for (int i = n - 2; i >= 0; i--) {  
+        right *= nums[i + 1];
+        res[i] *= right;
+    }
+    return res;
+}
+```
+
+## 361. Bomb Enemy
+https://leetcode.com/problems/bomb-enemy/
+
+带有前后缀思想的DP, 使用DP记录在当前位置能炸死的敌人, 但是需要行和列, 共四个方向的信息, 使用类似prefix 和 suffix的办法, 先更新四个方向的信息, 进行累加, 再 find max
+
+```java
+ public int maxKilledEnemies(char[][] grid) {
+     // DP[i][j], the enemy can be killed at i row and j col, 
+     int n = grid.length, m = grid[0].length, res = 0, cnt = 0;
+     int[][] dp = new int[n + 1][m + 1];
+     
+     for (int i = 0; i < n; i++) {           // calculate row prefix and suffix
+         cnt = 0;
+         for (int j = 0; j < m; j++) {       // row prefix
+             if (grid[i][j] == 'E') cnt++;
+             if (grid[i][j] == 'W') cnt = 0;
+             if (grid[i][j] == '0') {
+                 dp[i][j] += cnt;
+             }
+         }
+         cnt = 0;
+         for (int j = m - 1; j >= 0; j--) { // row suffix
+             if (grid[i][j] == 'E') cnt++;
+             if (grid[i][j] == 'W') cnt = 0;
+             if (grid[i][j] == '0') {
+                 dp[i][j] += cnt;
+             }
+         }
+     }
+     
+     for (int j = 0; j < m; j++) {           // calculate col prefix and suffix
+         cnt = 0;
+         for (int i = 0; i < n; i++) {       // col prefix
+             if (grid[i][j] == 'E') cnt++;
+             if (grid[i][j] == 'W') cnt = 0;
+             if (grid[i][j] == '0') {
+                 dp[i][j] += cnt;
+                 res = Math.max(res, dp[i][j]);
+             }
+         }
+         cnt = 0;
+         for (int i = n - 1; i >= 0; i--) {       // col suffix
+             if (grid[i][j] == 'E') cnt++;
+             if (grid[i][j] == 'W') cnt = 0;
+             if (grid[i][j] == '0') {
+                 dp[i][j] += cnt;
+                 res = Math.max(res, dp[i][j]);
+             }
+         }            
+     }
+     
+     return res;
+ }
+```

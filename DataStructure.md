@@ -468,3 +468,199 @@ https://leetcode.com/problems/design-in-memory-file-system/
 ```java
 
 ```
+
+
+
+
+
+## 2349. Design a Number Container System 
+https://leetcode.com/problems/design-a-number-container-system/
+
+双Map + TreeSet, 一个存 Index -> Num, 一个存 Num -> Index. 使用 TreeSet 实现快速指定数字增删.    
+TreeSet好处: 是 Set, 更是 Sorted Set, 实现是Tree Map, Set 中的数字按照 从小到大 排列, add, remove, contains 等操作都是 O(logN).     
+有 ceiling (>= x), floor (<= x), higher (> x), lower (< x), first, last, pollFirst, pollLast 等操作.
+
+```java
+class NumberContainers {
+    // Map, store the used index and its number -- <Integer, Integer>
+    // ReverseMap, number and indexs pair   -- <Integer, TreeSet<Integer>>
+    Map<Integer, Integer> index2Num;
+    Map<Integer, TreeSet<Integer>> num2Index;
+    
+    public NumberContainers() {
+        index2Num = new HashMap<>();
+        num2Index = new HashMap<>();
+    }
+    
+    public void change(int index, int number) {
+        if (index2Num.containsKey(index)) {         // update
+            int oriNum = index2Num.get(index);
+            num2Index.get(oriNum).remove(index);    // remove old num -> index mapping
+        }
+        index2Num.put(index, number);
+        num2Index.putIfAbsent(number, new TreeSet<>());
+        num2Index.get(number).add(index);
+    }
+    
+    public int find(int number) {
+        if (num2Index.containsKey(number)) {
+            if (num2Index.get(number).isEmpty())
+                return -1;
+            return num2Index.get(number).first();
+        } 
+        return -1;
+    }
+}
+```
+
+## 2353. Design a Food Rating System
+https://leetcode.com/problems/design-a-food-rating-system/
+
+3 MAP + TreeSet. **LeetCode 的 Pair 实现 有TMD大问题**, 不能再用了. 以后但凡遇到 Pair的形式, 直接上 Custom Class.
+
+
+```java
+class FoodRatings {
+    Map<String, String> dishSys;
+    Map<String, Integer> dishPrice;
+    Map<String, TreeSet<Food>> map; // cuisine --SortedList<Pair<String, Integer>>
+    
+    public FoodRatings(String[] foods, String[] cuisines, int[] ratings) {
+        map = new HashMap<>();
+        dishSys = new HashMap<>();
+        dishPrice = new HashMap<>();
+        
+        for (int i = 0; i < foods.length; i++) {
+            Food f = new Food(foods[i], ratings[i]);
+            TreeSet<Food> set = map.getOrDefault(cuisines[i], new TreeSet(new Comparator<Food>(){
+         @Override
+         public int compare(Food o1, Food o2){
+             if (o1.rate == o2.rate)
+                 return o1.name.compareTo(o2.name);                 
+             
+             return o2.rate - o1.rate;
+         }
+     }));
+            set.add(f);
+            map.put(cuisines[i], set);
+            dishSys.put(foods[i], cuisines[i]);
+            dishPrice.put(foods[i], ratings[i]);
+        }
+    }
+    
+    public void changeRating(String food, int newRating) {
+        String belongSys = dishSys.get(food);
+        Integer oldPrice = dishPrice.get(food);
+        Food pair = new Food(food, oldPrice);
+        map.get(belongSys).remove(pair);
+        map.get(belongSys).add(new Food(food, newRating));
+        dishPrice.put(food, newRating);
+    }
+    
+    public String highestRated(String cuisine) {
+        return map.get(cuisine).first().name;
+    }
+    
+    
+    class Food{
+        String name;
+        int rate;
+        
+        public Food (String n, int r) {
+            name = n;
+            rate = r;
+        }
+    }
+}
+```
+
+
+
+## 114. Flatten Binary Tree to Linked List
+https://leetcode.com/problems/flatten-binary-tree-to-linked-list/
+
+将 二叉树 转为 LinkedList, 三种方法:
+1. StraightForward
+2. in-place, 在 node 的 left subTree 找到最右先序节点 prev, 把 node 的 right subTree 接到 prev 的 right, 再把 node 的 left 转到 right, left 置空即可
+3. 递归实现方法二
+
+```java
+TreeNode prev = null;
+
+public void flatten(TreeNode root) {
+  if (root == null)
+      return;
+  
+//         method1: (straightforward) store all the node in pre-order then re-pointer
+  Deque<TreeNode> stack = new ArrayDeque<>();
+  List<TreeNode> list = new ArrayList<>();
+  stack.push(root);
+  
+  while (!stack.isEmpty()) {
+      TreeNode node = stack.pop();
+      list.add(node);
+      if (node.right != null)
+          stack.push(node.right);
+      if (node.left != null)
+          stack.push(node.left);
+  }
+  
+  for (int i = 1; i < list.size(); i++) {
+      TreeNode node = list.get(i);
+      root.left = null;
+      root.right = node;
+      root = root.right;
+  }
+  
+  // method2: (in-place) find the prev node, make node's right subTree became prev's right subTree, then convert the node left subTree to the right
+  
+  while (root != null) {
+      if (root.left != null) {
+          TreeNode prev = root.left;
+          while (prev.right != null) {
+              prev = prev.right;
+          }
+          prev.right = root.right;
+          root.right = root.left;
+          root.left = null;
+      }
+      root = root.right;
+  }
+  
+  
+
+  // method3: recursion
+  flatten(root.right);
+  flatten(root.left);
+  root.right = prev;
+  root.left = null;
+  prev = root;
+}
+```
+
+## 729. My Calendar I
+https://leetcode.com/problems/my-calendar-i/
+
+范围查找的经典例题, 使用 TreeMap 实现,只需要查找 start 左右的节点即可, 不要把问题复杂化, 开始节点左边的 end <= start, 开始节点右边的 start >= end 即可, 不用考虑太多
+
+```java
+class MyCalendar {
+    TreeMap<Integer, Integer> tmap;
+    
+    public MyCalendar() {
+        tmap = new TreeMap<>();
+    }
+    
+    public boolean book(int start, int end) {
+        Integer leftStart = tmap.floorKey(start);
+        Integer rightStart = tmap.ceilingKey(start);
+        
+        if ((leftStart == null || tmap.get(leftStart) <= start) &&
+           (rightStart == null || rightStart >= end)) {
+            tmap.put(start, end);
+            return true;
+        }
+        return false;
+    }
+}
+```

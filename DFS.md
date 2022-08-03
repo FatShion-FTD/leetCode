@@ -389,3 +389,39 @@ https://leetcode.com/problems/out-of-boundary-paths/
      return res;         
  }
 ```
+
+2359. Find Closest Node to Given Two Nodes
+https://leetcode.com/problems/find-closest-node-to-given-two-nodes/
+
+用个 MAP 存 node1 经过的节点 + 距离, 从 node2 开始走, 如果 node2 经过的结点在 map 中, 则要求 二者之中较远距离 最小. (而不是TMD, node1 到 node 距离最远, node2 到 node 距离最近, CNM)
+
+```java
+ public int closestMeetingNode(int[] edges, int node1, int node2) {
+     // map store the distance from node1, and from node2, trying to find the node
+     // which is in the map, with the res = min(max(dis1, dis2), res)
+     
+     Map<Integer, Integer> map1 = new HashMap<>();
+     int node = node1, dis = 0;
+     while (!map1.containsKey(node) && node != -1) {
+         map1.put(node, dis++);
+         node = edges[node];
+     }
+     
+     node = node2; dis = 0;
+     Map<Integer, Integer> map2 = new HashMap<>();
+     int res = Integer.MAX_VALUE, max = Integer.MAX_VALUE;
+     while (!map2.containsKey(node) && node != -1) {
+         if (map1.containsKey(node)) {
+             int curr = Math.max(dis, map1.get(node));        // get the max dist to node from node1 and node2 
+             if (curr <= max) {
+                 res = curr == max ? Math.min(res, node) : node;
+                 max = curr;
+             }
+         }
+         map2.put(node, dis++);
+         node = edges[node];
+     }
+     
+     return res == Integer.MAX_VALUE ? -1 : res;
+ }
+```

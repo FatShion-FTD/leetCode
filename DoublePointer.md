@@ -374,3 +374,77 @@ private boolean helper(String s, String t, boolean reverse){
     return true;
 }
 ```
+
+
+## 792. Number of Matching Subsequences
+https://leetcode.com/problems/number-of-matching-subsequences/
+
+砍头法: Map + 队列. 核心思想是每个word都有指针. 使用 word 的首字母作为 MAP 的 key, 把 word 存为 value. 每次遍历 s 中的字母, 去 MAP 中寻找对应的 words. 
+
+使用 queue 是为了先进先出, 使用 size 实现类似 BFS 的访问. O(n + maxLen(word))
+
+```java
+ public int numMatchingSubseq(String s, String[] words) {
+     Map<Character, Deque<String>> map = new HashMap<>();
+     for (String word : words){
+         map.putIfAbsent(word.charAt(0), new ArrayDeque<>());
+         map.get(word.charAt(0)).offer(word);
+     }
+     int res = 0;
+     for (char c : s.toCharArray()) {
+         Deque<String> q = map.getOrDefault(c, null);
+         if (q == null)  
+             continue;
+         int size = q.size();               // 记录当前大小, 防止越界计算, 类BFS
+         for (int i = 0; i < size; i++) {
+             String word = q.poll();
+             if (word.length() == 1){
+                 res += 1;
+             } else {
+                 map.putIfAbsent(word.charAt(1), new ArrayDeque<>());
+                 map.get(word.charAt(1)).offer(word.substring(1));       
+             }
+         }
+     }
+     return res;
+ }
+```
+
+
+## 1055. Shortest Way to Form String
+https://leetcode.com/problems/shortest-way-to-form-string/
+
+先使用 alphBet 返回非法解, 然后使用 双指针遍历, 如果相同, 同时后移, 如果不同, 则更新 source 指针, 一旦 source 指针到达末尾, 则 cnt + 1, 并重置 source 指针.
+
+```java
+public int shortestWay(String source, String target) {
+    boolean[] alphBet1 = new boolean[26], alphBet2 = new boolean[26];
+    for(char c : source.toCharArray()){
+        alphBet1[c-'a'] = true;
+    }
+    for(char c : target.toCharArray()){
+        alphBet2[c-'a'] = true;
+    }
+    for(int i = 0; i < 26; i++) {
+        if(alphBet2[i] && !alphBet1[i])
+            return -1;
+    }
+    
+    int ptr1 = 0, ptr2 = 0, cnt = 0;
+    while(ptr2 < target.length()){
+        if(target.charAt(ptr2) == source.charAt(ptr1)){
+            ptr1++;
+            ptr2++;
+        } else {
+            while(ptr1 < source.length() && target.charAt(ptr2) != source.charAt(ptr1)){
+                ptr1++;
+            }
+        }
+        if(ptr1 == source.length()){
+            cnt++;
+            ptr1 = 0;
+        }
+    }
+    return ptr1 > 0 ? cnt + 1 : cnt;
+}
+```

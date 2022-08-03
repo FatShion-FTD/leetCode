@@ -318,3 +318,121 @@ public void reorderList(ListNode head) {
 }
 ```
 
+
+# Reverse Linked List
+## 206. Reverse Linked List
+https://leetcode.com/problems/reverse-linked-list/
+
+使用dummy 作为 new ListNode 的 tail, 并且把 original next 指向 dummy, 实现反转
+
+```java
+public ListNode reverseList(ListNode head) {
+    ListNode dummy = null;
+    while(head != null){
+        ListNode next = head.next;
+        head.next = dummy;
+        dummy = head;
+        head = next;
+    }
+    return dummy;
+}
+```
+
+## 92. Reverse Linked List II
+https://leetcode.com/problems/reverse-linked-list-ii/
+
+使用 stack 实现 O(N + (right - left)) 的 iterative solution
+
+```java
+public ListNode reverseBetween(ListNode head, int left, int right) {
+    if(head == null)    return null;
+    left -= 1;
+    
+    Deque<ListNode> stack = new ArrayDeque<>();             // stack, store the node 
+    ListNode prev = new ListNode(-1, head);
+    
+    // find prev and last in one pass
+    ListNode dummy = prev, node = head, last = head;
+    int cnt = 0;
+    while(node != null){
+        if(cnt < left){
+            prev = prev.next;
+        }
+        if(cnt < right){
+            last = last.next;
+        }
+        if(cnt >= left && cnt < right){
+            stack.push(node);
+        }
+        cnt++;
+        node = node.next;
+    }
+
+    // rebuild the innner nodes
+    while(!stack.isEmpty()){
+        prev.next = stack.pop();
+        prev = prev.next;
+    }
+    prev.next = last;
+    
+    return dummy.next;
+}
+```
+
+高级 One pass, 使用三个 ListNode: prev, curr, tail. prev 是在 反转List开头的前一个, curr 是当前节点, tail 是尾节点. 核心: 保持 prev 和 curr 不变, prev 的下一个始终是 tail, curr 的下一个始终是 最新的tail, 通过将 tail 放到 prev 后面, curr 指向最后面, 进行翻转
+
+1. curr 的 next 指向 tail 的 next, 保证链表能够访问到下一个node;    
+2. tail 的 next 指向 prev 的 next, 表示 tail 和 curr 之间的 next 反向;
+3. prev 的 next 指向 tail, 将本来是 prev 和 curr 之间的 next 变为 prev 和 tail 之间的 next, 从而实现 prev -> tail -> curr 的反向;
+4. tail 变为 curr 的 next, 表示为走到下一组;
+5. 此时, 
+
+```java
+public ListNode reverseBetween(ListNode head, int left, int right) {
+    if(head == null)    return null;
+
+    ListNode prev = new ListNode(-1, head);
+    ListNode dummy = prev, curr = head, tail = null;
+    
+    for(int i = 0; i < left - 1; i++)
+        prev = prev.next;
+    
+    curr = prev.next;
+    tail = curr.next;
+    
+    for(int i = 0; i < right - left; i++){
+        curr.next = tail.next;  // 2 -> 4           
+        tail.next = prev.next;  // 3 -> 2
+        prev.next = tail;       // 1 -> 3
+        tail = curr.next;       // tail -> 4
+        // 1 -> 3 -> 2 -> 4 -> 5
+    }   
+    
+    return dummy.next;
+}
+```
+
+## 86. Partition List
+https://leetcode.com/problems/partition-list/
+
+双指针, 一个是小指针, 一个是大指针, 拼接即可
+
+```java
+ public ListNode partition(ListNode head, int x) {
+     ListNode smaller = new ListNode(-1), bigger = new ListNode(-1);
+     ListNode smallHead = smaller, bigHead = bigger;
+     while(head != null){
+         if(head.val >= x){
+             bigger.next = head;
+             bigger = bigger.next;
+         }else{
+             smaller.next = head;
+             smaller = smaller.next;
+         }
+         head = head.next;
+     }
+     smaller.next = bigHead.next;
+     bigger.next = null;
+     return smallHead.next;
+ }
+```
