@@ -90,9 +90,8 @@ public int minimumNumbers(int num, int k) {
 462. Minimum Moves to Equal Array Elements II
 https://leetcode.com/problems/minimum-moves-to-equal-array-elements-ii/
 
-一般有三种中间值的找法: mean median mode, 但是所有的找法都需要计算 x, where nums[i] <= x <= nums[j], && i == n - j    
-从 nums[i] 到 x 的距离计算就是: count += abs(nums[i] - x)    
-如果此时同时取得两个
+一般有2种中间值的找法: mean median, 此题选择使用median    
+原因: 假设 AC 在两段, B 在中间, 如果选择median, AC都走到B, path = C - A; 如果选择 mean, 一旦 B 不在mean位置就需要再走一段, 则 path = C - A + |B - mean|;
 
 ```java
 public int minMoves2(int[] nums) {
@@ -122,5 +121,61 @@ public int minMoves(int[] nums) {
        min = Math.min(min, num);
    }
    return sum - min * n;
+}
+```
+
+## 858. Mirror Reflection (别他妈写你那逼模拟了)
+https://leetcode.com/problems/mirror-reflection/
+
+有意思的数学几何问题, 尝试扩展空间, 不要被一个 room 限制了想象力, 尝试扩展 room, 当反射触及upper bondary 又没有达到 corner, 扩展空间.     
+数学关系: # of room * room length = # of reflect * q length (当是retancgle时可以调整)    
+相等时, 如果 # of reflect 是 odd, 在左边, 返回 2;      
+如果 # of reflect 是 even, 在右边, 跟据 # of room 返回 0 or 1;     
+
+![https://s3-lc-upload.s3.amazonaws.com/users/motorix/image_1529877876.png](https://s3-lc-upload.s3.amazonaws.com/users/motorix/image_1529877876.png)
+
+```java
+public int mirrorReflection(int p, int q) {
+   // need the step length, where the step = p/q
+   // step wont be changed
+   // if relect # is odd, must be on left hand
+   // if reflect # is even, on right hand, see the room #, if odd, returnr 1
+   int room = 1, qNum = 1;
+   while (room * p != qNum * q) {
+       qNum += 1;
+       room = qNum * q / p; 
+   }
+   if (qNum % 2 == 0)
+       return 2;
+   if (room % 2 == 1)
+       return 1;
+   return 0;
+}
+```
+
+## 458. Poor Pigs
+https://leetcode.com/problems/poor-pigs/
+
+经典msft面试题, 好玩的脑筋急转弯. 假设我们有 16个桐子, 2个猪, 3轮儿:    
+1 2 3 4    
+5 6 7 8    
+9 10 11 12   
+13 14 15 16     
+
+一个猪头一轮喝一列, 另个猪头一轮喝一行, 通过交叉定位 和 排除法 就能定位.    
+如 喝 3rd row的死了, 但是所有喝列的都没死, 则定位为第四列的 12    
+综上: 一个猪头代表一个维度, (round + 1 ) ^ (# of pigs) = N
+
+```java
+public int poorPigs(int buckets, int minutesToDie, int minutesToTest) {
+   if (minutesToTest / minutesToDie == 0 || buckets == 1)
+       return 0;
+   
+   int res = 1, round = 1 + minutesToTest / minutesToDie, tot = (int)Math.pow(round, res);
+   while (tot < buckets) {
+       tot = (int)Math.pow(round, ++res);
+   }
+   
+   return res;
 }
 ```

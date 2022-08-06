@@ -1319,3 +1319,75 @@ https://leetcode.com/problems/bomb-enemy/
      return res;
  }
 ```
+
+## 1162. As Far from Land as Possible
+https://leetcode.com/problems/as-far-from-land-as-possible/
+
+**DP + 双向遍历 + overflow处理**, 很简单的最小值 + 1 转移:      
+正向遍历, dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i][j]) + 1     
+反向遍历, dp[i][j] = min(dp[i+1][j], dp[i][j+1], dp[i][j]) + 1     
+但是注意Overflow的情况, 不能使用 Integer.MAX_VALUE: 正向遍历时候, 因为 water cell 一旦不能找到 已计算的node, 则 将被设置为 MAX_VALUE, 下一个node 计算时 + 1 就会造成 Overflow, 所以选择超过 最大 path length 的一个 constant.
+
+```java
+ public int maxDistance(int[][] grid) {
+     // DP, the min distance from land to curr water cell
+     // search Twice, from left-up and right-bottom
+     // cause if start from left-up, the right-bottom info is not known
+     // setting the water cell initial to 1000 rather than Integer.MAX_VALUE, which cause overflow
+     if (grid == null || grid.length == 0)
+         return -1;
+     
+     int res = 0;
+     int n = grid.length, m = grid[0].length;
+     // search from left-up
+     for (int i = 0; i < n; i++) {
+         for (int j = 0; j < m; j++) {
+             if (grid[i][j] == 1)
+                 continue;
+             grid[i][j] = 1000;
+             if (i - 1 >= 0) grid[i][j] = Math.min(grid[i][j], 1 + grid[i - 1][j]);
+             if (j - 1 >= 0) grid[i][j] = Math.min(grid[i][j], 1 + grid[i][j - 1]);
+         }
+     }
+     // search from right-bottom
+     for (int i = n - 1; i >= 0; i--) {
+         for (int j = m - 1; j >= 0; j--) {
+             if (grid[i][j] == 1)
+                 continue;
+             if (i + 1 < n) grid[i][j] = Math.min(grid[i][j], 1 + grid[i + 1][j]);
+             if (j + 1 < m) grid[i][j] = Math.min(grid[i][j], 1 + grid[i][j + 1]);
+             res = Math.max(res, grid[i][j]);
+         }
+     }
+     
+     return res == 1000 ? -1 : res - 1;
+ }
+```
+
+## 377. Combination Sum IV
+https://leetcode.com/problems/combination-sum-iv/
+
+标准DP, dp[i] += dp[i - num] for num : nums if i - num >= 0
+
+```java
+ public int combinationSum4(int[] nums, int target) {
+     // DP[i], from 0 to target, indicate the # of combination where the sum is i
+     // dp[0] = 1
+     // Arrays.sort(nums)
+     // dp[i] += dp[i-num] for num: nums, if i - num >= 0
+     if (nums == null || nums.length == 0)
+         return 0;
+     
+     Arrays.sort(nums);
+     int[] dp = new int[target + 1];
+     dp[0] = 1;
+     for (int i = 1; i <= target; i++) {
+         for (int num : nums) {
+             if (i - num < 0)
+                 break;
+             dp[i] += dp[i - num];
+         }
+     }
+     return dp[target];
+ }
+```

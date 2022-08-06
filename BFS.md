@@ -72,3 +72,56 @@ public int findCheapestPrice(int n, int[][] flights, int src, int dst, int K) {
 }
 ```
 
+## 1162. As Far from Land as Possible
+https://leetcode.com/problems/as-far-from-land-as-possible/
+
+BFS + visited + 4向搜索, 把所有 land 的四周节点加入 queue, 同时每次加入 queue时都更新 visited 表, 一层一层迭代搜索. 
+
+```java
+final static int[] DIRS = new int[]{-1, 0, 1, 0, -1};
+
+public int maxDistance(int[][] grid) {
+    // BFS, store all the land surrounding node into queue
+    // searched node added to visited matrix
+    // search one layer by one lyaer, until there is no unvisited node
+    if (grid == null || grid.length == 0)
+        return -1;
+    
+    Deque<int[]> q = new ArrayDeque<>();
+    boolean[][] visited = new boolean[grid.length][grid[0].length];
+    int res = 0;
+    
+    for (int i = 0; i < grid.length; i++) {
+        for (int j = 0; j < grid[0].length; j++) {
+            for (int k = 1; k < DIRS.length && grid[i][j] == 1; k++) {
+                visited[i][j] = true;
+                int ni = i + DIRS[k-1], nj = j + DIRS[k];
+                if (ni >= 0 && ni < grid.length && nj >= 0 && nj < grid[0].length 
+                    && !visited[ni][nj] && grid[ni][nj] == 0) {
+                    q.offer(new int[]{ni, nj});
+                    visited[ni][nj] = true;
+                }
+            }
+        }
+    }
+    
+    while (!q.isEmpty()) {
+        int size = q.size();
+        for (int l = 0; l < size; l++) {
+            int[] node = q.poll();
+            int i = node[0], j = node[1];
+            for (int k = 1; k < DIRS.length; k++) {
+                int ni = i + DIRS[k-1], nj = j + DIRS[k];
+                if (ni >= 0 && ni < grid.length && nj >= 0 && nj < grid[0].length 
+                    && !visited[ni][nj] && grid[ni][nj] == 0) {
+                    q.offer(new int[]{ni, nj});
+                    visited[ni][nj] = true;
+                }
+            }
+        }
+        res += 1;
+    }
+    
+    return res == 0 ? -1 : res;
+}
+```

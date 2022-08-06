@@ -425,3 +425,66 @@ https://leetcode.com/problems/find-closest-node-to-given-two-nodes/
      return res == Integer.MAX_VALUE ? -1 : res;
  }
 ```
+
+## 417. Pacific Atlantic Water Flow
+https://leetcode.com/problems/pacific-atlantic-water-flow/
+
+DFS + **反向思维**, 使用 **DFS 从 Pac 和 Atl 的边缘, 找到所有可以反向流入的点**, 再构建答案
+
+为什么不是正向思维, 因为使用正向思维, 从 一个点 开始, 途径的点会有重复计算, 而且这个重复的情况并不能 很好的记录下来, 需要已经计算的 点 的四向信息; 一个点可能有多条流入途径; 判断条件不好写, 单纯的 && 会误判, 需要额外的DFS func. 寄
+
+```java
+final static int[] DIRS = new int[]{-1, 0, 1, 0, -1};
+List<List<Integer>> res;
+boolean[][] isPac, isAtl;
+
+public List<List<Integer>> pacificAtlantic(int[][] heights) {
+  // rain, if neighb's height <= curr height, 
+  // from the edge node, find all reachable node in Island from both Ocean
+  // build res based on 2 memo
+  // dfs, with memo
+  // 2 memo, isPac, isAtl
+  res = new ArrayList<>();
+  
+  if (heights == null || heights.length == 0)
+      return res;
+  
+  int n = heights.length, m = heights[0].length;
+  isPac = new boolean[n][m];
+  isAtl = new boolean[n][m];
+  
+  // search from bondary, find all reachable nodes
+  for (int i = 0; i < n; i++) {
+      dfs(heights, isPac, i, 0);
+      dfs(heights, isAtl, i, m - 1);
+  }
+  
+  for (int j = 0; j < m; j++) {
+      dfs(heights, isPac, 0, j);
+      dfs(heights, isAtl, n - 1, j);
+  }
+  
+  for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+          if (isPac[i][j] && isAtl[i][j])
+              res.add(Arrays.asList(i, j));
+      }   
+  }
+  
+  return res;
+}
+
+private void dfs (int[][] h, boolean[][] v, int r, int c) {
+  v[r][c] = true;
+  
+  for (int i = 1; i < DIRS.length; i++) {
+      int nr = r + DIRS[i-1], nc = c + DIRS[i];
+      
+      if (nr < 0 || nr >= h.length || nc < 0 || nc >= h[0].length || v[nr][nc])
+          continue;
+      
+      if (h[nr][nc] >= h[r][c])
+          dfs(h, v , nr, nc);
+  }
+}
+```
