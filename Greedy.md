@@ -3,7 +3,8 @@
 贪心算法, 常见技术: 统计最后出现位置, 多指针, 二分, 统计出现次数
 
 
-Partition Labels: https://leetcode.com/problems/partition-labels/
+## Partition Labels
+https://leetcode.com/problems/partition-labels/
 
 1. 遍历统计最后出现位置
 2. 记录当前子串中每个char的最后出现位置currEnd, 和index比较,相同则减去上一字串的末尾lastEnd, 加入结果
@@ -29,7 +30,8 @@ public List<Integer> partitionLabels(String s) {
 }
 ```
 
-Smallest String With A Given Numeric Value: https://leetcode.com/problems/smallest-string-with-a-given-numeric-value/
+## Smallest String With A Given Numeric Value
+https://leetcode.com/problems/smallest-string-with-a-given-numeric-value/
 
 贪心点: 只有n个z, m个a 还有 一个 a-z 的char组成, 先计算z的数量, 再计算剩下的.
 
@@ -55,7 +57,8 @@ Smallest String With A Given Numeric Value: https://leetcode.com/problems/smalle
  }
 ```
 
-Broken Calculator: https://leetcode.com/problems/broken-calculator/
+## Broken Calculator
+https://leetcode.com/problems/broken-calculator/
 
 反向Greedy代表, 从结果往开始条件推, 确保target下降最快. 最后计算 初始值需要减少的量即可
 
@@ -74,7 +77,8 @@ Broken Calculator: https://leetcode.com/problems/broken-calculator/
  }
 ```
 
-2 Keys Keyboard: https://leetcode.com/problems/2-keys-keyboard/
+## 2 Keys Keyboard
+https://leetcode.com/problems/2-keys-keyboard/
 
 使用遍历每个长度的办法, 首先dp[i] = i 意为 直接从一个A复制过来所需要的次数; 反向遍历 j 直到找到最大的乘数, new dp[i] = 达成 dp[j] 的次数 + 倍数 
 
@@ -94,7 +98,8 @@ Broken Calculator: https://leetcode.com/problems/broken-calculator/
  }
 ```
 
-Boats to Save People: https://leetcode.com/problems/boats-to-save-people/
+## Boats to Save People
+https://leetcode.com/problems/boats-to-save-people/
 
 注意一个点: 一个船只能坐俩人, 双指针更容易
 
@@ -115,7 +120,8 @@ Boats to Save People: https://leetcode.com/problems/boats-to-save-people/
  }
 ```
 
-Two City Scheduling: https://leetcode.com/problems/two-city-scheduling/
+## Two City Scheduling
+https://leetcode.com/problems/two-city-scheduling/
 
 核心: 排序 + lambda表达式. 计算去A赚钱 a[0] - a[1] 的结果, 把去A赚最多的和去B亏最少的 (等效) 排序. 按顺序分配即可. (a, b) -> (a[0] - a[1]) - (b[0] - b[1]) 中 a - b 相当于升序
 
@@ -131,7 +137,8 @@ Two City Scheduling: https://leetcode.com/problems/two-city-scheduling/
  }
 ```
 
-277. Find the Celebrity: https://leetcode.com/problems/find-the-celebrity/
+## 277. Find the Celebrity
+https://leetcode.com/problems/find-the-celebrity/
 
 使用栈实现带有排除的两两比较, stack储存不认识别的人, 每次取出栈顶的两个元素, 看看他俩是否互相认识, 非 celebrity 必须认识 celebrity, 则每次都能去掉一个
 
@@ -299,3 +306,56 @@ https://leetcode.com/problems/the-latest-time-to-catch-a-bus/
  }
 ```
 
+## 435. Non-overlapping Intervals
+https://leetcode.com/problems/non-overlapping-intervals/
+
+去掉最少的 intervals 来使得没有重叠 -> 找最多的 non-overlapping intervals   
+为了找更多的 intervals, 需要使得 剩余空间越大越好(更多的空间意味着更多的可能), 而不是开始时间越早越好.   
+如: [1, 10], [2, 3], [4, 5] 如果选择开始时间早, 则需要去掉两个; 选择剩余时间最多, 则只用去掉一个.    
+
+```java
+ public int eraseOverlapIntervals(int[][] intervals) {
+     // sort by the end time in ascend order, compare the prev end and curr start, if overlap, res ++; else, prev end = curr end.
+     if (intervals == null || intervals.length <= 1)
+         return 0;
+     
+     Arrays.sort(intervals, (o1, o2) -> o1[1] - o2[1]);
+     int end = intervals[0][1], res = 0;
+     for (int i = 1; i < intervals.length; i++) {
+         if (intervals[i][0] >= end) {
+             end = intervals[i][1];
+         } else {
+             res++;
+         }
+     }        
+     return res;
+ }
+```
+
+
+## 452. Minimum Number of Arrows to Burst Balloons
+https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/
+
+和上一题类似的 interval 问题, 这次需要把有 overlap 的 merge 起来, 并找到所有的 distinct interval. 注意 end 每次 merge 时候需要找 min
+
+```java
+ public int findMinArrowShots(int[][] points) {
+     // find # of the distinct intervals
+     if (points == null || points.length == 0)
+         return 0;
+     
+     Arrays.sort(points, (o1, o2) -> Integer.compare(o1[0], o2[0]));
+     int end = points[0][1], res = 1;
+     
+     for (int i = 1; i < points.length; i++) {
+         if (points[i][0] <= end) {
+             end = Math.min(end, points[i][1]);
+         } else {
+             res += 1;
+             end = points[i][1];
+         }
+     }
+     
+     return res;
+ }
+```
