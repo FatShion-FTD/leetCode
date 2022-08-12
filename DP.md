@@ -583,7 +583,8 @@ public int maxProfit(int[] prices) {
 }
 ```
 
-Longest Increasing Subsequence: https://leetcode.com/problems/longest-increasing-subsequence/
+## Longest Increasing Subsequence
+https://leetcode.com/problems/longest-increasing-subsequence/
 
 使用一维DP, 记录到 i 为止的单增子序列长度, 从0开始遍历end, 和 end 之前所有的lastEnd相比, 来更新dp[end]; 如果当前值大于lastEnd的值, 则lastEnd的长度+1和当前最大值. 转移函数:
 
@@ -607,6 +608,32 @@ public int lengthOfLIS(int[] nums) {
     }
     return res;
 }
+```
+
+## 2370. Longest Ideal Subsequence
+https://leetcode.com/problems/longest-ideal-subsequence/
+
+和 最长单增子序列很像, 同样使用 一个 dp 记录每个元素最后出现的时的 最长子序列, 在合法范围内, dp[i] = max(dp[i], dp[j] + 1), 本题的条件是, 在一个 +-k 的范围内波动. 
+
+```java
+ public int longestIdealString(String s, int k) {
+     if (s == null || s.length() == 0)
+         return 0;
+     
+     int n = s.length(), res = 0;
+     int[] dp = new int[26];
+     
+     for (char c : s.toCharArray()) {
+         int idx = c - 'a';
+         int tmp = 1;
+         for (int i = Math.max(0, idx - k); i <= Math.min(25, idx + k); i++) {
+             tmp = Math.max(tmp, dp[i] + 1);
+         }
+         res = Math.max(res, dp[idx] = tmp);
+     }
+
+     return res;
+ }
 ```
 
 
@@ -1390,4 +1417,48 @@ https://leetcode.com/problems/combination-sum-iv/
      }
      return dp[target];
  }
+```
+
+## 823. Binary Trees With Factors
+https://leetcode.com/problems/binary-trees-with-factors/
+
+Map + DP, 最优子状态是: leaf node 已经形成了一个valid product tree, 以次为基础(叶子节点), 上推更多的tree. 使用 map, key 存 root 的值, value 存 # of product tree. 相乘即可. 注意Overflow
+
+```java
+final static int MOD = 1000000007;
+int res = 0;
+
+public int numFactoredBinaryTrees(int[] arr) {
+  // req: node.val = node.left.val * node.right.val
+  // basic Idea is: 3Sum
+  // map, key is the product, key is # of tree that using key as root
+  // iterate the prev part, find all the possible combination 
+  // cuz it's unqiue so that map can be used
+  
+  if (arr == null || arr.length == 0)
+      return 0;
+  
+  Map<Integer, Integer> map = new HashMap<>();
+  Arrays.sort(arr);
+  for (int num : arr) {
+      int cnt = map.getOrDefault(num, 0);
+      for (int i = 0; i < arr.length && arr[i] < num; i++) {
+          if (num % arr[i] == 0) {                            // can be completely divided
+              int rest = num / arr[i];        
+              if (map.containsKey(rest)) {                    // deal with Overflow using long
+                  long cnt1 = (long) map.get(rest) % MOD, cnt2 = (long) map.get(arr[i]) % MOD;
+                  long p = cnt1 * cnt2 % MOD;
+                  cnt = (cnt + (int) p) % MOD;
+              }
+          }
+      }
+      map.put(num, (cnt + 1) % MOD);
+  }
+  
+  for (Map.Entry<Integer, Integer> e : map.entrySet()) {
+      res = (res % MOD + e.getValue() % MOD) % MOD;
+  }
+  
+  return res % MOD; 
+}
 ```

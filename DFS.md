@@ -488,3 +488,76 @@ private void dfs (int[][] h, boolean[][] v, int r, int c) {
   }
 }
 ```
+
+## 386. Lexicographical Numbers
+https://leetcode.com/problems/lexicographical-numbers/
+
+DFS, 也可以是O(n), 这种类似 Trie 树的 DFS, 遍历效果也是 O(n)    
+从 1-9 作为 base 开始, DFS 构建新数字即可, curr * 10 + i
+
+```java
+List<Integer> res = new ArrayList<>();
+
+public List<Integer> lexicalOrder(int n) {
+  if (n == 0)
+      return res;
+  
+  for (int i = 1; i < 10; i++) {
+      dfs(n, i);
+  }
+  return res;
+}
+
+private void dfs (int n, int curr) {
+  if (curr > n)
+      return;
+  
+  res.add(curr);
+  for (int i = 0; i < 10; i++) {
+      dfs(n, 10 * curr + i);
+  }
+}
+```
+
+## 388. Longest Absolute File Path
+https://leetcode.com/problems/longest-absolute-file-path/
+
+DFS + String, 把这个结构看成树, \t 储存了层数的信息, 注意 stack 只存当前层之前的信息, 一旦 stack 大小 > 当前层, 说明深度不对, 需要pop; 以及使用 replace 替换来计算长度
+
+```java
+public int lengthLongestPath(String str) {
+  // DFS
+  // \n means goto subdir/file, \t means the depth of next sub
+  // using stack to store the length of dir/file
+  if (str == null || str.length() == 0)
+      return 0;
+  
+  int i = 0, n = str.length();
+  int res = 0, curr = 0;
+  String[] strs = str.split("\n");
+  Deque<Integer> stack = new ArrayDeque<>();
+  
+  for (String s : strs) {
+      int level = countLevel(s);
+      
+      while (stack.size() > level) {      // stack is not at same level as curr dir/file
+          curr -= stack.pop();
+      }
+      
+      int len = s.replaceAll("\t", "").length() + 1;      // +1: remain one '/' at last
+      curr += len;
+      
+      if (s.contains(".")) {
+          res = Math.max(res, curr - 1);
+      }
+      stack.push(len);
+  }
+  
+  
+  return res;
+}
+
+private int countLevel (String s) {
+  return s.length() - s.replace("\t", "").length();
+}
+```

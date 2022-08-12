@@ -341,3 +341,97 @@ num[i-1] = max(num[i-1], num[i] + 1)
      return res;
  }
 ```
+
+
+## 76. Minimum Window Substring
+https://leetcode.com/problems/minimum-window-substring/
+
+滑窗 + MAP, 注意滑窗的条件:
+1. 第一层 Loop 只走滑窗 right, 并更新滑窗内容;
+2. 第二层 Loop 只在当一个有效的滑窗构建完毕, 记录当前信息作为 res, 并只走 left, 更新滑窗内容.
+3. 本题使用 trick: String Pattern 的长度作为 判断滑窗是否构建完毕的指标. 
+
+```java
+public String minWindow(String s, String t) {
+    // map + sliding window
+    // s's sliding window contains all t's char firstly, how? 
+    if (s == null || s.length() == 0)
+        return "";
+    if (t == null || t.length() == 0) {
+        return s;
+    }
+    
+    Map<Character, Integer> map = new HashMap<>();
+    Map<Character, Integer> window = new HashMap<>();
+    for (char c : t.toCharArray()) {
+        map.put(c, map.getOrDefault(c, 0) + 1);
+        window.put(c, 0);
+    }
+    
+    int left = 0, right = 0, start = 0, len = Integer.MAX_VALUE, remain = t.length();
+    
+    
+    while (right < s.length()) {
+        // right expand
+        char rChar = s.charAt(right);
+        if (map.containsKey(rChar)) {          // right is part of t
+            if (window.get(rChar) < map.get(rChar))
+                remain--;
+            window.put(rChar, window.get(rChar) + 1);
+        }
+        right++;
+        while (remain == 0) {
+            if (right - left < len) {
+                len = right - left;
+                start = left;
+            }
+            char lChar = s.charAt(left);
+            if (map.containsKey(lChar)) {
+                window.put(lChar, window.get(lChar) - 1);
+                if (window.get(lChar) < map.get(lChar))
+                    remain++;
+            }
+            left++;
+        }
+    }
+    
+    return len == Integer.MAX_VALUE ? "" : s.substring(start, start + len);
+}
+```
+
+## 340. Longest Substring with At Most K Distinct Characters
+https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/
+
+和上面一道题基本原理一样, map + 滑窗 的处理, 外 loop 滑 right, 内 loop 滑 left. 但是滑动条件是, substring 的 size < k.    
+(优化计算res)  注意 res 计算位置, 一. 只有 size > k 更新, 二. 结束时候如果 size <= k, 更新
+
+```java
+ public int lengthOfLongestSubstringKDistinct(String s, int k) {
+     // right move until 
+     if (s == null || s.length() == 0 || k == 0)
+         return 0;
+     
+     Map<Character, Integer> map = new HashMap<>();
+     int left = 0, right = 0, res = -1;
+     
+     while (right < s.length()) {
+         char rChar = s.charAt(right);
+         map.put(rChar, map.getOrDefault(rChar, 0) + 1);
+         if (map.size() > k) {
+             res = Math.max(res, right - left);
+             while (left < right && map.size() > k) {
+                 int cnt = map.get(s.charAt(left));
+                 if (cnt == 1)
+                     map.remove(s.charAt(left));
+                 else
+                     map.put(s.charAt(left), cnt - 1);
+                 left++;
+             }
+         }
+         right++;
+     }
+     if (map.size() <= k)
+         res = Math.max(res, right - left);
+     return res == -1 ? s.length() : res;
+ }
+```

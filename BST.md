@@ -9,7 +9,7 @@
 
 144. Binary Tree Preorder Traversal: https://leetcode.com/problems/binary-tree-preorder-traversal/
 
-前序访问, 迭代DFS实现: 左 中 右, 在所有左探的路上记录 val
+前序访问, 迭代DFS实现: 中 左 右, 在所有左探的路上记录 val
 ```java
 public List<Integer> preorderTraversal(TreeNode root) {
     List<Integer> res = new ArrayList<>();
@@ -31,7 +31,7 @@ public List<Integer> preorderTraversal(TreeNode root) {
 
 94. Binary Tree Inorder Traversal: https://leetcode.com/problems/binary-tree-inorder-traversal/
 
-中序访问, 迭代DFS实现: 中 左 右, 则在左探结束后, 把值加入
+中序访问, 迭代DFS实现: 左 中 右, 则在左探结束后, 把值加入
 ```java
 public List<Integer> inorderTraversal(TreeNode root) {
     List<Integer> res = new ArrayList<>();
@@ -502,5 +502,49 @@ private TreeNode helper(int head, int tail){
   root.left = left;
   root.right = right;
   return root;
+}
+```
+
+## 314. Binary Tree Vertical Order Traversal
+https://leetcode.com/problems/binary-tree-vertical-order-traversal/
+
+树的竖向遍历, 记录 shift 和 min/max, 使用 map 存每个shift 对应的list, queue 存储 shift 和 node 即可
+
+```java
+public List<List<Integer>> verticalOrder(TreeNode root) {
+  // BFS + shift + min / max as range
+  List<List<Integer>> res = new ArrayList<>();
+  if (root == null)
+      return res;
+  
+  Map<Integer, List<Integer>> map = new HashMap<>();      // store the shift and corresponding list
+  Deque<Pair<TreeNode, Integer>> q = new ArrayDeque<>();  // store node and its shift 
+  int min = 0, max = 0;
+  q.offer(new Pair(root, 0));
+  
+  while (!q.isEmpty()) {
+      Pair<TreeNode, Integer> p = q.poll();
+      TreeNode node = p.getKey();
+      int shift = p.getValue();
+      
+      List<Integer> l = map.getOrDefault(shift, new ArrayList<>());
+      l.add(node.val);
+      map.put(shift, l);
+      
+      if (node.left != null) {
+          q.offer(new Pair(node.left, shift - 1));
+          min = Math.min(min, shift - 1);
+      }
+      if (node.right != null) {
+          q.offer(new Pair(node.right, shift + 1));
+          max = Math.max(max, shift + 1);
+      }
+  }
+  
+  for (int i = min; i <= max; i++) {       // build res
+      res.add(map.get(i));
+  }
+  
+  return res;
 }
 ```

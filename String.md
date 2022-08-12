@@ -401,3 +401,69 @@ public List<String> findRepeatedDnaSequences(String s) {
    return new ArrayList<>(res);
 }
 ```
+
+
+# String 子串, last occur
+## 2262. Total Appeal of A String
+https://leetcode.com/problems/total-appeal-of-a-string/
+
+
+
+```java
+ public long appealSum(String s) {
+     // find the last appear and last appear of special char
+     // all substring start after the last appear (i - last[c-'a']: # of start position)
+     // end after new appear contains this char (n - i: # of end positoin)
+     // (i - last[c-'a']) * (n - i)
+     // fill last with -1, so that when char first counted, at least 1 start position
+     if (s == null || s.length() == 0)
+         return 0l;
+     
+     char[] arr = s.toCharArray();
+     long res = 0l;
+     int[] lastOccur = new int[26];
+     Arrays.fill(lastOccur, -1);
+     for (int i = 0; i < arr.length; i++) {
+         res += (long) (i - lastOccur[arr[i] - 'a']) * (arr.length - i);
+         lastOccur[arr[i] - 'a'] = i;
+     }
+     return res;
+ }
+```
+
+## 179. Largest Number
+https://leetcode.com/problems/largest-number/
+
+String 组合的大小比较, 求两个String组合的最大情况. 最简单的 String 比较器: o1 + o2 和 o2 + o1 再比较二者ascii大小即可, 其实也可以用指针, 但是很麻烦, 略过
+
+```java
+ public String largestNumber(int[] nums) {
+     if (nums == null || nums.length == 0)
+         return "";
+     
+     StringBuilder sb = new StringBuilder();
+     int n = nums.length;
+     String[] strs = new String[n];
+     
+     for (int i = 0; i < n; i++) {
+         strs[i] = String.valueOf(nums[i]);
+     }
+     
+     Arrays.sort(strs, new Comparator<String>(){
+           @Override
+           public int compare(String o1, String o2){
+               String str1 = o1 + o2;
+               String str2 = o2 + o1;
+               return str1.compareTo(str2);
+           }
+       });
+     
+     for (int i = n - 1; i >= 0; i--) {
+         if (i == n - 1 && strs[i].equals("0")) 
+             return "0";
+         sb.append(strs[i]);
+     }
+     
+     return sb.toString();
+ }
+```

@@ -179,3 +179,35 @@ public int poorPigs(int buckets, int minutesToDie, int minutesToTest) {
    return res;
 }
 ```
+
+
+## 204. Count Primes
+https://leetcode.com/problems/count-primes/
+
+使用一个 boolean array 记录到 n 为止所有的数是否为 prime, 思路: 把 所有小于 n 的数 和 其倍数都设置为 false 最后统计 true 即可. 优化: 
+1. 使用 i * i < n 而不是 sqrt, 省 time; 
+2. 在计算 j 的时候, 实际上 2 - (j-1) 的数字已经计算过, 所以 j 从 i * i 开始即可, 如 5, 2 * 5, 3 * 5 等都计算过, 从 5 * 5 开始即可
+
+```java
+public int countPrimes(int n) {
+   if (n <= 2)
+       return 0;
+   
+   boolean[] isPrime = new boolean[n];
+   Arrays.fill(isPrime, true);
+   isPrime[0] = false; isPrime[1] = false;
+   
+   for (int i = 2; i * i < n; i++) {
+       if (!isPrime[i])        // not prime, has divided
+           continue;
+       for (int j = i * i; j < n; j += i) {        // 2 - i-1 之前的都算过了 
+           isPrime[j] = false;
+       }
+   }
+   int res = 0;
+   for (boolean prime : isPrime) {
+       res += prime ? 1 : 0;
+   }
+   return res;
+}
+```
