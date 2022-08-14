@@ -435,3 +435,184 @@ https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characte
      return res == -1 ? s.length() : res;
  }
 ```
+
+## 30. Substring with Concatenation of All Words
+https://leetcode.com/problems/substring-with-concatenation-of-all-words/
+
+MAP + 另类滑窗, 首先使用 map 记录 word 的个数, 然后从每个点开始, 作为起点, 寻找有效窗口, [0, str.len - n * m] 是滑窗起点, 然后把起点 i 之后的 string, 取 substring 检查是否为有效 (存在 和 #) 即可. 
+
+```java
+ public List<Integer> findSubstring(String s, String[] words) {
+     // map stores all the token, and its #
+     // on each index, as start index, split the continuos substring as token, check exist and # 
+     List<Integer> res = new ArrayList<>();
+     if (s == null || words == null) {
+         return res;
+     }
+     
+     int n = words.length, m = words[0].length();
+     Map<String, Integer> map = new HashMap<>();
+     Map<String, Integer> v = new HashMap<>();
+     
+     for (String w : words) {
+         map.put(w, map.getOrDefault(w, 0) + 1);
+     }
+     
+     for (int i = 0; i <= s.length() - n * m; i++) {         // make sure, when s.len == n * m, i = 0, loop
+         v.clear();
+         int cnt = 0;
+         while (cnt < n) {
+             String token = s.substring(i + cnt * m, i + (cnt + 1) * m);
+             if (map.containsKey(token)) {
+                 v.put(token, v.getOrDefault(token, 0) + 1);
+                 if (v.get(token) > map.get(token))            // invalid # of tk
+                     break;
+             } else 
+                 break;
+             cnt++;
+         }
+         if (cnt == n)
+             res.add(i);
+     }
+     return res;
+ }
+```
+
+# Word Ladder 系列
+给定一个 开始 word 和 结束 word, 还有 一组 word set, 检查是否能从 开始word 变换到 结束word. 变换条件为: 一次只能更换一个char, 且路径 word 必须在 word set 中.
+## 127. Word Ladder
+https://leetcode.com/problems/word-ladder/
+
+找最短路径的长度. BFS, 更高级的双端 BFS. 不再使用单一的 Queue, 使用俩 Set, 保证每次搜索, 都在搜索一个较小的区间.
+
+```java
+ public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+     Set<String> wordSet = new HashSet<String>(wordList);
+     if(!wordList.contains(endWord)) return 0;
+     Set<String> beginSet = new HashSet<String>(), endSet = new HashSet<String>(), visited = new HashSet<String>();
+     int len = beginWord.length();
+     int res = 1;
+     
+     beginSet.add(beginWord);
+     endSet.add(endWord);
+     // 不使用queue, 反而使用set, 双端开始搜索, 使用visited避免重复
+     while(!beginSet.isEmpty() && !endSet.isEmpty()){
+         // always search for small set
+         if(beginSet.size() > endSet.size()){
+             Set<String> temp = endSet;
+             endSet = beginSet;
+             beginSet = temp;
+         }
+         
+         Set<String> tempSet = new HashSet<String>();
+         for(String word : beginSet){
+             char[] chrArr = word.toCharArray();
+             for(int i = 0; i < chrArr.length; i++){
+                 for(char j = 'a'; j <= 'z'; j++){
+                     char ori = chrArr[i];
+                     chrArr[i] = j;
+                     String target = String.valueOf(chrArr);
+                     // 检测尾集合存在目标str
+                     if(endSet.contains(target)){
+                         return res + 1;
+                     }
+                     // 不存在, target记录作为下次搜索和已访问
+                     if(!visited.contains(target) && wordSet.contains(target)){
+                         tempSet.add(target);
+                         visited.add(target);
+                     }
+                     chrArr[i] = ori;
+                 }
+             }
+         }
+         res += 1;
+         beginSet = tempSet;
+     }
+     
+
+     return 0;
+ }
+```
+
+## 126. Word Ladder II
+https://leetcode.com/problems/word-ladder-ii/
+
+找所有最短路径. BFS 搜索 + DFS 构建答案 + 深度检测剪枝   
+深度检测作用: 防止超过最短情况的无效搜索, 比如当前 String 的 step 是 10, 但是其最短 step 是 8, 则不再搜索该 String.  
+为什么深度检测好? 在问题 I 中, 使用 visited 防止重复搜索, 但是在本题, 重复搜索是可能的, 比如: "dog" -> "hog" 和 "hog" -> "dog" 都需要被记录, 其次, 重复搜索也有可能带来更低的 step. 
+
+```java
+class Solution {
+    Map<String,List<String>> map;
+    List<List<String>> results;
+    public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
+        // 核心: DFS (构建答案) + BFS (构建映射) + ** 深度记录 **
+        // 深度记录: 用于记录从 beginWord 到其余 word 的变换次数, 有且只有记录变换次数最小的情况
+        results = new ArrayList<>();
+        
+        if(wordList.size() ==0 || !wordList.contains(endWord)) 
+            return results;
+
+        int min = Integer.MAX_VALUE;
+
+        Deque<String> queue = new ArrayDeque<>();
+        queue.add(beginWord);
+
+        map = new HashMap<String,List<String>>();
+        Map<String,Integer> ladder = new HashMap<>();           // 记录到当前 string 所需的步数
+
+        for (String string : wordList) {
+            ladder.put(string,Integer.MAX_VALUE);               
+        }
+        ladder.put(beginWord,0);
+
+        while (!queue.isEmpty()) {
+            String word = queue.poll();
+            int step = ladder.get(word) + 1;                     // 变换到到 word 的所需步数
+            if (step > min)                                      // 退出条件: 变换步数 比最小值 大, 不再搜索
+                break;
+
+            for (int i = 0; i < word.length(); i++) {
+                StringBuilder sb = new StringBuilder(word);
+                
+                for (char c = 'a'; c<= 'z'; c++) {
+                    sb.setCharAt(i,c);
+                    String new_word = sb.toString();
+                    if (ladder.containsKey(new_word)) {           // ladder 也兼具 wordSet 作用
+                        
+                        if(step > ladder.get(new_word))           // 变换到的新 word step 比原先更长, 不再搜索
+                            continue;
+                        else if(step < ladder.get(new_word)){
+                            queue.add(new_word);
+                            ladder.put(new_word,step);
+                        }
+                        
+                        map.putIfAbsent(new_word, new ArrayList<>());   // 记录 word 到 邻居 的 mapping
+                        map.get(new_word).add(word);
+                
+                        if(new_word.equals(endWord))              // 抵达出口, 更新 min 以便在这次遍历完成后退出
+                            min = step;
+                    }
+                }
+            }
+
+        }
+        dfs(endWord, beginWord, new ArrayList<>());
+        return results;
+    }
+
+    private void dfs(String word, String start, List<String> list) {
+        if (word.equals(start)) {
+            list.add(0, start);
+            results.add(new ArrayList<String>(list));
+            list.remove(0);
+            return;
+        }
+        list.add(0, word);
+        if (map.get(word) != null)
+            for (String s : map.get(word))
+                dfs(s, start, list);
+        list.remove(0);
+    }
+}
+```
