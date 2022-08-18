@@ -331,3 +331,82 @@ public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
    return null;
 }
 ```
+
+## 130. Surrounded Regions
+https://leetcode.com/problems/surrounded-regions/
+
+又有一种新的技巧, UnionFind 的 dummy ptr. 把 p[n] 作为 dummy, 并把所有有特殊需求 (主要为不与图中任意元素连接, 或者有特殊链接要求) 的 ptr union 到这个 dummy, 实现具有 区别对待的 unionfind.
+
+```java
+class Solution {
+    final static int[] DIRS = new int[]{-1, 0, 1, 0, -1};
+    
+    public void solve(char[][] b) {
+        if (b == null)
+            return;
+        
+        int m = b.length, n = b[0].length;
+        UnionFind uf = new UnionFind(m * n);
+        
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == 0 || j == 0 || i == m - 1 || j == n - 1 && b[i][j] == 'O') 
+                    uf.union(i * n + j, m * n);
+                
+                else if (b[i][j] == 'O') {
+                    for (int k = 1; k < DIRS.length; k++) {
+                        int row = i + DIRS[k - 1], col = j + DIRS[k];
+                        if (row >= 0 && row < m && col >= 0 && col < n && b[row][col] == 'O')
+                            uf.union(i * n + j, row * n + col);
+                    }
+                }
+            }
+        }
+        
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (b[i][j] == 'O' && uf.find(i * n + j) != uf.find(m * n))
+                    b[i][j] = 'X';
+            }
+        }
+        
+    }
+    
+    class UnionFind {
+        int[] p;
+        int[] r;
+        int size;
+        
+        public UnionFind (int n) {
+            this.size = n;
+            p = new int[n + 1];
+            r = new int[n + 1];
+            for (int i = 0; i <= n; i++) {
+                p[i] = i;
+                r[i] = 0;
+            }
+        }
+        
+        public int find (int x) {
+            if (p[x] == x)
+                return x;
+            return p[x] = find(p[x]);
+        }
+        
+        public void union (int x, int y) {
+            int px = find(x);
+            int py = find(y);
+            if (px != py) {
+                if (r[px] > r[py]) {
+                    p[py] = px;
+                } else if (r[px] < r[py]) {
+                    p[px] = py;
+                } else {
+                    p[py] = px;
+                    r[px] += 1;
+                }
+            }
+        }
+    }
+}
+```

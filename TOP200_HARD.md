@@ -1,8 +1,61 @@
 # TOP200 HARD 实录
 ## 前两北的HARD是背都要被下来的!!
-### 25. Reverse Nodes in k-Group: https://leetcode.com/problems/reverse-nodes-in-k-group/
 
-10. Regular Expression Matching: https://leetcode.com/problems/regular-expression-matching/
+## 4. Median of Two Sorted Arrays
+https://leetcode.com/problems/median-of-two-sorted-arrays/
+
+二分, 但是不是查找, 而是砍掉. 多细节: 
+1. 砍掉的长度 rem 需要 - 1 确保偶数不会多砍; 
+2. 砍掉各自后面最大的, 最后剩下的就是最后一个, 就是各自最大的.
+3. 偶数时, 寻找较小的最大值有两种情况: 
+    1. len - 1, 直接就在最后
+    2. len - 2, 比如: [1, 2], [-1, 3], 最后留下 [1, 2] 和 [-1], 第二个最大值并不在最后.
+
+```java
+public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+    int len1 = nums1.length, len2 = nums2.length;
+    if (len1 == 0)
+        return len2 % 2 == 0 ? (double) (nums2[(len2 - 1) / 2] + nums2[(len2 - 1) / 2 + 1]) / 2 : (double) nums2[(len2 - 1) / 2];
+    if (len2 == 0)
+        return len1 % 2 == 0 ? (double) (nums1[(len1 - 1) / 2] + nums1[(len1 - 1) / 2 + 1]) / 2 : (double) nums1[(len1 - 1) / 2];
+    
+    boolean isEven = (len1 + len2) % 2 == 0;
+    int rem = (len2 + len1 - 1) / 2;        // 需要砍掉的长度, -1 确保为 even 时不会多砍
+    while (rem != 0) {
+        int half = (rem + 1) / 2;           // nums1 和 nums2 都砍掉 rem / 2
+        int cut1 = Math.max(0, len1 - half), cut2 = Math.max(0, len2 - half);
+        // 砍掉大的, 这样 nums[-1] 就是各自最大的
+        if (nums1[cut1] > nums2[cut2]) {
+            rem -= (len1 - cut1);
+            len1 = cut1;
+        } else {
+            rem -= (len2 - cut2);
+            len2 = cut2;
+        }
+        if (len1 == 0)
+            return isEven ? (double) (nums2[len2 - 1 - rem] + nums2[len2 - 1 - rem - 1]) / 2 : (double) nums2[len2 - 1 - rem];
+        if (len2 == 0)
+            return isEven ? (double) (nums1[len1 - 1 - rem] + nums1[len1 - 1 - rem - 1]) / 2 : (double) nums1[len1 - 1 - rem];
+    }
+    
+    if (isEven) {
+        // 长度为偶数, 则 中位数 来自 两个最大的数的 sum / 2, 较大值一定在各自最后, 而较小值有多种出现位置
+        // len - 1 和 len - 2
+        int larger = Math.max(nums1[len1 - 1], nums2[len2 - 1]), smaller = Math.min(nums1[len1 - 1], nums2[len2 - 1]);
+        if (len1 - 2 >= 0)  
+            smaller  = Math.max(smaller, nums1[len1 - 2]); 
+        if (len2 - 2 >= 0)  
+            smaller  = Math.max(smaller, nums2[len2 - 2]);
+        return (double) (larger + smaller) / 2;
+    }
+    
+    // 返回大的
+    return nums1[len1 - 1] < nums2[len2 - 1] ? nums2[len2 - 1] : nums1[len1 - 1];
+}
+```
+
+## 10. Regular Expression Matching
+https://leetcode.com/problems/regular-expression-matching/
 
 动态规划, 
 
@@ -38,6 +91,9 @@ public boolean isMatch(String s, String p) {
     return dp[m][n];
 }
 ```
+
+## 25. Reverse Nodes in k-Group
+ https://leetcode.com/problems/reverse-nodes-in-k-group/
 
 分为K组的反转链表, 基础版: 分组, 重建, 处理特殊, O(n), O(n)
 ```java
@@ -131,7 +187,40 @@ private ListNode reverse(ListNode head, ListNode tail){
 }
 ```
 
-### 32. Longest Valid Parentheses: https://leetcode.com/problems/longest-valid-parentheses/
+## 44. Wildcard Matching
+https://leetcode.com/problems/wildcard-matching/
+
+DP. 两种转移: 
+1. Pattern 的 char 和 Str 的 char 一样: p[j] == s[i] || p[j] == '?': dp[i][j] = dp[i-1][j-1];
+2. 如果 Pattern 的 char 是 '*', 则可以继承所有上一状态.
+
+```java
+public boolean isMatch(String s, String p) {
+   int n = s.length(), m = p.length();
+   boolean[][] dp = new boolean[n + 1][m + 1];
+   dp[0][0] = true;
+   // if j == '*', all true (it's empty)
+   for (int j = 1; j <= m; j++) {
+       if (p.charAt(j - 1) != '*')
+           break;
+       dp[0][j] = true;
+   }
+   
+   for (int i = 1; i <= n; i++) {
+       for (int j = 1; j <= m; j++) {
+           // cur char in Pattern is same as cur char in Str
+           if (p.charAt(j - 1) == s.charAt(i - 1) || p.charAt(j - 1) == '?')   
+               dp[i][j] = dp[i - 1][j - 1];
+           else if (p.charAt(j - 1) == '*')    // 
+               dp[i][j] = dp[i - 1][j] || dp[i][j - 1] || dp[i - 1][j - 1];
+       }
+   }
+   return dp[n][m];
+}
+```
+
+## 32. Longest Valid Parentheses
+https://leetcode.com/problems/longest-valid-parentheses/
 
 1. 先遍历整个str, 记录所有不成对bracket的位置, 则所有GAP就是最长子集了
 2. 再每次从栈顶拿出, 记录GAP, 比较得到最大GAP
@@ -166,7 +255,8 @@ public int longestValidParentheses(String s) {
 }
 ```
 
-354. Russian Doll Envelopes: https://leetcode.com/problems/russian-doll-envelopes/
+## 354. Russian Doll Envelopes
+https://leetcode.com/problems/russian-doll-envelopes/
 
 先排序(1-2增, 2-1减), 后最长单增子序列
 
@@ -208,7 +298,8 @@ public int longestValidParentheses(String s) {
  }
 ```
 
-1996. The Number of Weak Characters in the Game: https://leetcode.com/problems/the-number-of-weak-characters-in-the-game/submissions/
+## 1996. The Number of Weak Characters in the Game
+https://leetcode.com/problems/the-number-of-weak-characters-in-the-game/submissions/
 
 上述类似问题, 但是更加trick, 0位单减, 1位单增, 形成Atk从大到小, Def在同Atk下从小到大, 在确保Atk单减的前提下, 则i+1和i一定存在 [i][0] >= [i+1][0]的关系, 保存最大的Def, 如果小于最大Def即weak, 同Atk单增, 确保edge case 如: [1, 4] 和 [1, 10] 
 
