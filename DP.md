@@ -1462,3 +1462,22 @@ public int numFactoredBinaryTrees(int[] arr) {
   return res % MOD; 
 }
 ```
+
+## 96. Unique Binary Search Trees
+https://leetcode.com/problems/unique-binary-search-trees/
+
+变形了的 树形DP, dp[i] 表示 # of unique BST. 对于有 i 个节点的 tree, 其 root 节点也就有 i 个, 将不同的节点作为 root, 其左右子树的大小就是: j - 1 和 i - j, 这些大小的树是之前计算过的子状态, 相乘累加即可.
+
+```java
+ public int numTrees(int n) {
+     int[] dp = new int[n + 1];
+     dp[0] = dp[1] = 1;
+     
+     for (int i = 2; i <= n; i++) {
+         for (int j = 1; j <= i; j++) {
+             dp[i] += dp[j-1] * dp[i-j];
+         }
+     }
+     return dp[n];
+ }
+```

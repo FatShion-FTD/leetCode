@@ -664,3 +664,52 @@ class MyCalendar {
     }
 }
 ```
+
+## 659. Split Array into Consecutive Subsequences
+https://leetcode.com/problems/split-array-into-consecutive-subsequences/
+
+2 Map, 使用 freq map 统计出现次数; 使用 seqTails map 记录以当前 key 结尾的 seqence 的数量.       
+
+当 num 不存在 seqTails 时, 说明是新的 seq 的起点, 向后查是否存在有效的 num + 1 和 num + 2 (长度要求, 至少为 3), 存在则更新对应 freq 并建立新的 tail: num + 3.       
+如果 num 存在在 seqTail 中, 则说明是一个可行的 seq 新tail, 更新 tail 即可.
+
+```java
+public boolean isPossible(int[] nums) {
+  // 2 Map: freq and seqTails
+  // seqTails counts # of seqs end at Key
+  if (nums == null || nums.length == 0)
+      return false;
+  
+  Map<Integer, Integer> freq = new HashMap<>(), seqTails = new HashMap<>();
+  
+  for (int num : nums) {
+      freq.put(num, freq.getOrDefault(num, 0) + 1);
+  }
+  
+  for (int num : nums) {
+      if (freq.get(num) <= 0)
+          continue;
+      
+      // num is at tail of existing seqs
+      if (seqTails.containsKey(num) && seqTails.get(num) > 0) {        
+          // extend seq length and update the tail information
+          seqTails.put(num, seqTails.get(num) - 1);                           
+          seqTails.put(num + 1, seqTails.getOrDefault(num + 1, 0) + 1);
+          
+          // new sequence head, need at least 2 more elements  
+      } else if (freq.containsKey(num + 1) && freq.get(num + 1) > 0 && 
+                 freq.containsKey(num + 2) && freq.get(num + 2) > 0) {  
+          
+          freq.put(num + 1, freq.get(num + 1) - 1);
+          freq.put(num + 2, freq.get(num + 2) - 1);
+          seqTails.put(num + 3, seqTails.getOrDefault(num + 3, 0) + 1);
+          
+      } else 
+          return false;
+      
+      freq.put(num, freq.get(num) - 1);
+  }
+  
+  return true;
+}
+```

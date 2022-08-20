@@ -359,3 +359,30 @@ https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/
      return res;
  }
 ```
+
+## 871. Minimum Number of Refueling Stops
+https://leetcode.com/problems/minimum-number-of-refueling-stops/
+
+一直在有最多油的站加油即可. 理解: 在能抵达的范围内, 记录所有加油站 (以油从高到低排列), 没有了就跳回能加最多油的station, 再跳回来即可. 
+
+```java
+ public int minRefuelStops(int target, int startFuel, int[][] stations) {
+     int res = 0, end = startFuel, n = stations.length, i = 0;
+     PriorityQueue<Integer> pq = new PriorityQueue<>((o1, o2) -> o2 - o1);
+     
+     while (end < target) {
+         while (i < n && end >= stations[i][0]) {
+             pq.offer(stations[i][1]);
+             i++;
+         }
+         
+         if (pq.isEmpty())
+             return -1;
+         
+         end += pq.poll();
+         res++;
+     }
+     
+     return end >= target ? res : -1;
+ }
+```

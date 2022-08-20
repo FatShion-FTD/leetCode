@@ -92,6 +92,38 @@ public boolean isMatch(String s, String p) {
 }
 ```
 
+## 44. Wildcard Matching
+https://leetcode.com/problems/wildcard-matching/
+
+DP. 两种转移: 
+1. Pattern 的 char 和 Str 的 char 一样: p[j] == s[i] || p[j] == '?': dp[i][j] = dp[i-1][j-1];
+2. 如果 Pattern 的 char 是 '*', 则可以继承所有上一状态.
+
+```java
+public boolean isMatch(String s, String p) {
+   int n = s.length(), m = p.length();
+   boolean[][] dp = new boolean[n + 1][m + 1];
+   dp[0][0] = true;
+   // if j == '*', all true (it's empty)
+   for (int j = 1; j <= m; j++) {
+       if (p.charAt(j - 1) != '*')
+           break;
+       dp[0][j] = true;
+   }
+   
+   for (int i = 1; i <= n; i++) {
+       for (int j = 1; j <= m; j++) {
+           // cur char in Pattern is same as cur char in Str
+           if (p.charAt(j - 1) == s.charAt(i - 1) || p.charAt(j - 1) == '?')   
+               dp[i][j] = dp[i - 1][j - 1];
+           else if (p.charAt(j - 1) == '*')   
+               dp[i][j] = dp[i - 1][j] || dp[i][j - 1] || dp[i - 1][j - 1];
+       }
+   }
+   return dp[n][m];
+}
+```
+
 ## 25. Reverse Nodes in k-Group
  https://leetcode.com/problems/reverse-nodes-in-k-group/
 
@@ -184,38 +216,6 @@ private ListNode reverse(ListNode head, ListNode tail){
     head.next = prev;
     first.next = curr;
     return first;
-}
-```
-
-## 44. Wildcard Matching
-https://leetcode.com/problems/wildcard-matching/
-
-DP. 两种转移: 
-1. Pattern 的 char 和 Str 的 char 一样: p[j] == s[i] || p[j] == '?': dp[i][j] = dp[i-1][j-1];
-2. 如果 Pattern 的 char 是 '*', 则可以继承所有上一状态.
-
-```java
-public boolean isMatch(String s, String p) {
-   int n = s.length(), m = p.length();
-   boolean[][] dp = new boolean[n + 1][m + 1];
-   dp[0][0] = true;
-   // if j == '*', all true (it's empty)
-   for (int j = 1; j <= m; j++) {
-       if (p.charAt(j - 1) != '*')
-           break;
-       dp[0][j] = true;
-   }
-   
-   for (int i = 1; i <= n; i++) {
-       for (int j = 1; j <= m; j++) {
-           // cur char in Pattern is same as cur char in Str
-           if (p.charAt(j - 1) == s.charAt(i - 1) || p.charAt(j - 1) == '?')   
-               dp[i][j] = dp[i - 1][j - 1];
-           else if (p.charAt(j - 1) == '*')    // 
-               dp[i][j] = dp[i - 1][j] || dp[i][j - 1] || dp[i - 1][j - 1];
-       }
-   }
-   return dp[n][m];
 }
 ```
 
