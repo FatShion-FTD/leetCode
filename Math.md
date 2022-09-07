@@ -211,3 +211,44 @@ public int countPrimes(int n) {
    return res;
 }
 ```
+
+## 869. Reordered Power of 2
+https://leetcode.com/problems/reordered-power-of-2/
+
+另类的 freq 记录办法, 在 counter 函数中, 不再使用 freq array, 而是 res += 10 ^ (N % 10)
+
+```java
+ public boolean reorderedPowerOf2(int n) {
+     long hc = counter(n);
+     for (int i = 0; i < 32; i++) {
+         if (hc == counter(1 << i))
+             return true;
+     }
+     return false;
+ }
+ 
+ private long counter (int num) {
+     long res = 0;
+     while (num != 0) {
+         res += Math.pow(10, num % 10);
+         num /= 10;
+     }
+     return res;
+ }
+```
+
+## 172. Factorial Trailing Zeroes
+https://leetcode.com/problems/factorial-trailing-zeroes/
+
+5 是产生 10 的必须, 5 * 2 = 10; 所以任务就是找到所有的 5, 则需要找所有 5's pow, 5, 25, 125 都要去找, 因为找 5 时, 25 = 5 * 5, 有额外的 5 藏在里面. 
+
+```java
+ public int trailingZeroes(int n) {
+     // which num could cause tail 0? 5^{?}, 5 * 2 = 10. 2, enough; find 5. # of 5
+     int res = 0;
+     for (int i = 5; i <= n; i *= 5) {
+         res += (n / i);
+     }
+     return res;
+ }
+```

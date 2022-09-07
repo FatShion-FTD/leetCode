@@ -407,7 +407,7 @@ https://leetcode.com/problems/search-a-2d-matrix-ii/
 ## 658. Find K Closest Elements
 https://leetcode.com/problems/find-k-closest-elements/
 
-二分查找区间而不是 index 或者 某个值, 而是找一个范围, 这个范围由 arr[left] 到 arr[left + k] 构成, 对于这个范围, 跟据题目需求, 可以进行调整, 该题为 K 个最接近元素, 则寻找这个范围的 中值 midVal, midVal = arr[mid] + arr[mid + k], 如果中值小于 x, 则说明范围可以适当右移, left = mid, 类推
+二分查找区间而不是 index 或者 某个值, 而是找一个范围, 这个范围由 arr[left] 到 arr[left + k] 构成, 对于这个范围, 跟据题目需求, 可以进行调整, 该题为 K 个最接近元素, 则寻找这个范围的 中值 midVal, midVal = arr[mid] + arr[mid + k], 如果中值小于 x, 则说明范围可以适当右移, left = mid, 类推 当中值 大于等于 x, 左移
 
 ```java
  public List<Integer> findClosestElements(int[] arr, int k, int x) {

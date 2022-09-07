@@ -68,7 +68,35 @@ public int numSubmatrixSumTarget(int[][] matrix, int target) {
 ## 363. Max Sum of Rectangle No Larger Than K
 https://leetcode.com/problems/max-sum-of-rectangle-no-larger-than-k/
 
+PreSum 的老套路, 遍历所有行的组合, 将问题退化为 1D arr. 问题变为 最和不超过 k 的子数组的和, 把所有的 preSum 装进 TreeSet , 用 ceiling 查找左侧仅次于 sum - k 的最大值 prev. 如果存在值, 说明区间有效, 再用 sum - prev 计算区间和即可
 
+```java
+public int maxSumSubmatrix(int[][] matrix, int k) {
+    int row = matrix.length, col = matrix[0].length, res = Integer.MIN_VALUE;
+    for (int startRow = 0; startRow < row; startRow++) {
+        int[] colSum = new int[col];
+        for (int endRow = startRow; endRow < row; endRow++) {
+            for (int i = 0; i < col; i++) {
+                colSum[i] += matrix[endRow][i];
+            }
+            res = Math.max(res, findSum(colSum, k));
+        }
+    }
+    return res;
+}
 
-
+private int findSum (int[] colSum, int k) {
+    TreeSet<Integer> ts = new TreeSet<>();
+    ts.add(0);
+    int max = Integer.MIN_VALUE, sum = 0;
+    for (int i = 0; i < colSum.length; i++) {
+        sum += colSum[i];
+        Integer prev = ts.ceiling(sum - k);
+        if (prev != null)
+            max = Math.max(max, sum - prev);
+        ts.add(sum);
+    }
+    return max;
+}
+```
 

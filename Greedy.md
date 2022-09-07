@@ -386,3 +386,78 @@ https://leetcode.com/problems/minimum-number-of-refueling-stops/
      return end >= target ? res : -1;
  }
 ```
+
+## 936. Stamping The Sequence
+https://leetcode.com/problems/stamping-the-sequence/
+
+标准的Greedy + simulation, 从后往前模拟直到初始状态. 每次遍历数组, 查找所有 substring 是否满足 stamp (? 表示为初始 = 任意字符), 然后更新 char array, 直到没有办法再更改, 查看 char array 是否全部为 ? 即可
+
+
+```java
+class Solution {
+    public int[] movesToStamp(String stamp, String target) {
+        char[] s = stamp.toCharArray(), t = target.toCharArray();
+        int n = t.length, m = s.length;
+        List<Integer> res = new ArrayList<>();
+        boolean isFlip = true;
+        
+        while (isFlip) {
+            isFlip = false;
+            for (int i = 0; i < n - m + 1; i++) {
+                isFlip |= reverse(s, t, i, res);
+            }
+        }
+        
+        for (char c : t) {
+            if (c != '?')
+                return new int[]{};
+        }
+        Collections.reverse(res);
+        return res.stream().mapToInt(i->i).toArray();
+    }
+    
+    private boolean reverse (char[] s, char[] t, int start, List<Integer> res) {
+        boolean isFlip = false;
+        for (int i = 0; i < s.length; i++) {    // traverse stamp from start index
+            if (t[start + i] == '?')            // already reversed
+                continue;
+            
+            if (t[start + i] != s[i])           // not a substring
+                return false;
+            isFlip = true;
+        }
+        if (isFlip) {
+            for (int i = 0; i < s.length; i++) {    // flip chars to ?
+                t[start + i] = '?';
+            }
+            res.add(start);
+        }
+        return isFlip;
+    }
+}
+```
+
+## 853. Car Fleet
+https://leetcode.com/problems/car-fleet/
+
+```java
+public int carFleet(int target, int[] position, int[] speed) {
+  // 绑定 position 和 到终点的时间, position 倒序
+  // 将距离到终点最近 和 第二近的 car 比较, 如果第二近的车时间短则一定相遇
+  List<double[]> list = new ArrayList<>();
+  for (int i = 0; i < speed.length; i++) {
+      list.add(new double[]{(double)position[i], (target - position[i]) / speed[i]});
+  }
+  Collections.sort(list, (o1, o2) -> o2[0] - o1[0]);
+  
+  int carIndex = 0, res = 1;
+  for (int i = 1; i < speed.length; i++) {
+      if (list.get(i) < list.get(carIndex)) {           // 不能相遇
+          res++;
+          carIndex = i;
+      }
+  }
+  
+  return res;
+}
+```

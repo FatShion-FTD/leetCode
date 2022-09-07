@@ -467,3 +467,69 @@ String 组合的大小比较, 求两个String组合的最大情况. 最简单的
      return sb.toString();
  }
 ```
+## 2384. Largest Palindromic Number
+https://leetcode.com/problems/largest-palindromic-number/
+
+记录 freq, 和最多的 evens, 使用 pq 存储保证每次访问都是最大的, 特殊情况: 
+1. 全是零, return "0"
+2. 就没 evens 或者 evens就个零, 从后往前找 
+
+跟据 pq 构建 String, 最后插入一个最大 odd 即可
+
+```java
+class Solution {
+    public String largestPalindromic(String num) {
+        StringBuilder sb = new StringBuilder();
+        int n = num.length();
+        char[] arr = num.toCharArray();
+        
+        int[] freq = new int[10];
+        for (int i = 0; i < n; i++) {
+            freq[arr[i] - '0'] += 1; 
+        }
+        
+        PriorityQueue<int[]> evens = new PriorityQueue<>((o1, o2) -> o1[0] - o2[0]);       
+        // record all the evens 
+        for (int i = 0; i < 10; i++) {
+            if (freq[i] % 2 == 0 && freq[i] != 0) {              // even freq
+                evens.add(new int[]{i, freq[i]});
+                freq[i] = 0;
+            }
+                
+            if (freq[i] % 2 == 1 && freq[i] > 1) {              // odd freq, -1 
+                evens.add(new int[]{i, freq[i]});
+                freq[i] = 1;
+            }
+        }
+        
+        if (evens.size() == 0 || (evens.size() == 1 && evens.peek()[0] == 0)) {   // only single char
+            for (int i = 9; i >= 0; i--) {
+                if (freq[i] != 0)
+                    return sb.append(i).toString();
+            }
+            return "0";
+        } 
+        
+        int index = 0;
+        while (!evens.isEmpty()) {
+            int[] p = evens.poll();
+            char[] half = new char[p[1] / 2];
+            for (int i = 0; i < p[1] / 2; i++) {
+                half[i] = (char)(p[0] + '0');
+            }
+            sb.append(half);
+            sb.insert(0, half);
+            index += p[1] / 2;
+        }
+        
+        for (int i = 9; i >= 0; i--) {
+            if (freq[i] != 0) {
+                sb.insert(index, i);
+                break;
+            }
+        }
+        
+        return sb.toString();
+    }
+}
+```
