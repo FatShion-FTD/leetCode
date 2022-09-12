@@ -245,3 +245,35 @@ https://leetcode.com/problems/construct-target-array-with-multiple-sums/
      }
  }
 ```
+
+## 1383. Maximum Performance of a Team
+https://leetcode.com/problems/maximum-performance-of-a-team/
+
+离散选择 k 个数字, 属性1的最小值 * 属性2的和. 首先绑定属性, 对属性 1 倒序排序, 这样每次遍历都是当前选择的最小值, 拿 前 k 个即可. 
+
+```java
+class Solution {
+    final static int MOD = 1000000007;
+    public int maxPerformance(int n, int[] speed, int[] efficiency, int k) {
+        // 拿效率前 k 个, 维持 speed sum 并用 pq 维持 k 个里面最小Speed, 超过 k 个去掉最小 speed 即可
+        // 因为效率降序, 所以每次拿到效率就是当前最小的效率
+        int[][] engs = new int[n][2];
+        for (int i = 0; i < n; i++) {
+            engs[i] = new int[]{efficiency[i], speed[i]};
+        }
+        Arrays.sort(engs, (o1, o2) -> o2[0] - o1[0]);       // sort descending order efficiency
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+        long res = 0, sumSpeed = 0;
+        for (int i = 0; i < n; i++) {
+            int curEff = engs[i][0], curSpeed = engs[i][1];
+            pq.offer(curSpeed);
+            sumSpeed = (sumSpeed + curSpeed);
+            if (pq.size() > k) {
+                sumSpeed = (sumSpeed - pq.poll());
+            }
+            res = Math.max(res, curEff * sumSpeed);
+        }
+        return (int)(res % MOD);
+    }
+}
+```

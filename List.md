@@ -1,6 +1,7 @@
 # ListNode
 
-Merge Two Sorted Lists: https://leetcode.com/problems/merge-two-sorted-lists/
+## Merge Two Sorted Lists
+https://leetcode.com/problems/merge-two-sorted-lists/
 
 双指针遍历, 使用dummy
 
@@ -25,7 +26,8 @@ public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
 }
 ```
 
-Merge k Sorted Lists: https://leetcode.com/problems/merge-k-sorted-lists/
+## Merge k Sorted Lists
+https://leetcode.com/problems/merge-k-sorted-lists/
 
 核心三点: 使用 PQ 实现一个 ListNode.val 单增的 优先队列 + 利用 List 的 next 特性实现延迟访问 + dummyHead
 
@@ -49,8 +51,9 @@ public ListNode mergeKLists(ListNode[] lists) {
 }
 ```
 
-
-Linked List Cycle: https://leetcode.com/problems/linked-list-cycle/
+# Cycle detect
+## Linked List Cycle 
+https://leetcode.com/problems/linked-list-cycle/
 
 使用快慢双指针, 找cycle, 数学原理: $2x - looplength * cycles = x;$ for x = 慢指针路径, looplength = 环的长度, cycles = 任意圈数
 
@@ -68,7 +71,8 @@ public boolean hasCycle(ListNode head) {
 }
 ```
 
-Linked List Cycle II: https://leetcode.com/problems/linked-list-cycle-ii/
+## Linked List Cycle II 
+https://leetcode.com/problems/linked-list-cycle-ii/
 
 $fast = 2 * slow;$ 快指针路径是慢的2倍
 
@@ -101,7 +105,8 @@ public ListNode detectCycle(ListNode head) {
 }
 ```
 
-Remove Duplicates from Sorted List: https://leetcode.com/problems/remove-duplicates-from-sorted-list/
+## Remove Duplicates from Sorted List 
+https://leetcode.com/problems/remove-duplicates-from-sorted-list/
 
 如果node.val == node.next.val 让 node.next 后移1位
 
@@ -120,7 +125,8 @@ public ListNode deleteDuplicates(ListNode head) {
 }
 ```
 
-Remove Duplicates from Sorted List II: https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
+## Remove Duplicates from Sorted List II 
+https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
 
 使用dummy作为前置头, pre 和 head 双指针, head 作为 访问Node, pre 作为 链接Node, pre = dummy 实现初始化时在 head 前, 同时 pre.next = head 实现了 pre.next 的重写; 
 
@@ -145,7 +151,8 @@ public ListNode deleteDuplicates(ListNode head) {
 }
 ```
 
-Add Two Numbers: https://leetcode.com/problems/add-two-numbers/
+## Add Two Numbers 
+https://leetcode.com/problems/add-two-numbers/
 
 使用carry计算当前位的和, 判断是否进位, 是否有上一位进
 
@@ -183,7 +190,8 @@ public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
 }
 ```
 
-Rotate List:  https://leetcode.com/problems/rotate-list/
+## Rotate List  
+https://leetcode.com/problems/rotate-list/
 
 先记录list长度并访问tail node, 把tail和head连一起, tail再走 $count - k \% count$ 抵达截断位置
 
@@ -209,7 +217,8 @@ public ListNode rotateRight(ListNode head, int k) {
 }
 ```
 
-Copy List with Random Pointer: https://leetcode.com/problems/copy-list-with-random-pointer/
+## Copy List with Random Pointer
+https://leetcode.com/problems/copy-list-with-random-pointer/
 
 先在原链上的每个original node后面新增要复制的copied node, 然后将 copied node 的random链接, 最后拆链, 拆为 original list 和 copied list
 
@@ -250,7 +259,8 @@ public Node copyRandomList(Node head) {
 }
 ```
 
-Swapping Nodes in a Linked List: https://leetcode.com/problems/swapping-nodes-in-a-linked-list/
+## Swapping Nodes in a Linked List 
+https://leetcode.com/problems/swapping-nodes-in-a-linked-list/
 
 一个访问双端 k-th 的 One-pass trick: 在访问到 k-th node 的时候, 把 node2 设置为 head, 这样当 node 访问到结尾的时候, node2 刚好在 n-k th 的位置, 实现 One-pass
 
@@ -271,7 +281,8 @@ public ListNode swapNodes(ListNode head, int k) {
 }
 ```
 
-19. Remove Nth Node From End of List: https://leetcode.com/problems/remove-nth-node-from-end-of-list/
+## 19. Remove Nth Node From End of List 
+https://leetcode.com/problems/remove-nth-node-from-end-of-list/
 
 和上面拿到题一样的思想, 但是注意使用 dummy before head 进行访问, 从而避免 n = 1 和 list.length = 1 时候的越界问题
 

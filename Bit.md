@@ -76,6 +76,17 @@ public int bitDiv(int dividend, int divisor){
 }
 ```
 
+## 进制转换
+```java
+public List<Boolean> trans(int n, int base) {
+    List<Boolean> bits = new ArrayList<>();
+    while (n >= 1) {
+        bits.add(n % base == 1);
+        n /= base;
+    }
+    return bits;
+}
+```
 ## Problems
 Single Number: https://leetcode.com/problems/single-number/
 
@@ -171,4 +182,36 @@ class Solution {
         return res;
     }
 }
+```
+
+## 2397. Maximum Rows Covered by Columns
+https://leetcode.com/problems/maximum-rows-covered-by-columns/
+
+使用 bitmask 进行所有组合的遍历. 使用 二进制 number 记录选取情况, 1 代表选中. 遍历所有组合方式, 通过 1 - (1 << n), 比如 n = 3, 则存在 1 - 8 表示二进制组合.
+
+```java
+ public int maximumRows(int[][] matrix, int numSelect) {
+     int m = matrix.length, n = matrix[0].length, res = 0;
+     int maxVal = 1 << n;                        // traverse all the combination
+     for (int mask = 1; mask < maxVal; mask++) {
+         if (Integer.bitCount(mask) != numSelect)
+             continue;
+         
+         int coverd = 0;
+         for (int i = 0; i < m; i++) {
+             boolean isCovered = true;
+             for (int j = 0; j < n; j++) {
+                 // mask >> j & 1, check the col at (mask >> j)
+                 // if j-th col is not selected, and there is 1 at j-th col 
+                 if ((mask >> j & 1) == 0 && matrix[i][j] == 1) {    
+                     isCovered = false;
+                     break;
+                 }
+             }
+             if (isCovered) coverd++;
+         }
+         res = Math.max(res, coverd);
+     }
+     return res;
+ }
 ```

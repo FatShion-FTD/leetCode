@@ -531,9 +531,10 @@ public int mincostTickets(int[] days, int[] costs) {
 }
 ```
 
-## 买卖股票
+# 买卖股票
 
-Best Time to Buy and Sell Stock: https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
+## Best Time to Buy and Sell Stock
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
 
 转移方程: res = max(res, nums[i] - min); min = min(min, nums[i]);
 
@@ -548,7 +549,8 @@ public int maxProfit(int[] prices) {
 }
 ```
 
-Best Time to Buy and Sell Stock II: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/
+## Best Time to Buy and Sell Stock II
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/
 
 将两次离散的买卖股票的时机拆成连续的时间, 即每天都在买卖股票直到最高价当日. 即第二天比前一天贵, 则昨天买,今天卖
 
@@ -564,7 +566,65 @@ public int maxProfit(int[] prices) {
 }
 ```
 
-Best Time to Buy and Sell Stock with Cooldown: https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/
+## 123. Best Time to Buy and Sell Stock III
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/
+
+因为最多 2次 交易, 所以使用状态机, 4种状态: hold1, sell1, hold2, sell2. 每次都和自己比较, buy 维持最小, sell 维持最大. 在第二次交易时, 考虑第一次的利润, 所以需要 hold2 - sell1.
+
+```java
+class Solution {
+    public int maxProfit(int[] prices) {
+        // at most 2 transaction
+        // hold only one stock at one time
+        // 4 state: hold1, sell1, hold2, sell2
+        int hold1 = Integer.MAX_VALUE, sell1 = 0, hold2 = Integer.MAX_VALUE, sell2 = 0;
+        for (int price : prices) {
+            hold1 = Math.min(hold1, price);                 // min first buy
+            sell1 = Math.max(sell1, price - hold1);         // max firsy sell
+            hold2 = Math.min(hold2, price - sell1);         // min second sell
+            sell2 = Math.max(sell2, price - hold2);
+        }
+        return Math.max(0, Math.max(sell1, sell2));
+    }
+}
+```
+
+## 188. Best Time to Buy and Sell Stock IV
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/
+
+$$ dp[k][i] = max(dp[k][i-1], max(price[i] - price[j] + dp[k - 1][j])) $$
+
+表示在 第 k 轮交易的 第 i 天, 两种操作: 
+1. 不进行操作, 继承昨天状态 dp[k][i-1]; 
+2. 进行卖出, 则 使用 price[i] - price[j] 获得利润, 并 + dp[k - 1][j], 加上上一轮交易在第 j 日产生的最大利润.
+
+为使得 price[i] - price[j] + dp[k - 1][j]) 最大, 则要记录与 j 相关的信息: 维护最小值 prices[j] - dp[k - 1][j], 表示 第 j 日前总投入最小.
+
+```java
+class Solution {
+    public int maxProfit(int k, int[] prices) {
+        //dp[k][i], profit at k-th transaction, i-th price
+        // dp[k][i] = max(dp[k][i-1], price[i] - min(price[j] - dp[k-1][j]))
+        int n = prices.length, res = 0;        
+        int[][] dp = new int[k + 1][n];
+        if (prices == null || prices.length == 0)
+            return 0;
+        
+        for (int t = 1; t <= k; t++) {
+            int min = prices[0];                    
+            for (int i = 1; i < n; i++) {
+                min = Math.min(min, prices[i] - dp[t - 1][i]);
+                dp[t][i] = Math.max(dp[t][i - 1], prices[i] - min);
+                res = Math.max(res, dp[t][i]);
+            }
+        }
+        return res;
+    }
+}
+```
+
+## Best Time to Buy and Sell Stock with Cooldown
+ https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/
 
 增加的冷却时间, 使用状态机办法解决, 持股A, 空仓C, 歇逼B 共三种状态. 再三种状态中转移, 持股A -> 持股A/歇逼B, 空仓C -> 空仓C/持股A, 歇逼B -> 空仓C. 返回 空仓C 和 歇逼B 的最大值.
 ![https://raw.githubusercontent.com/hot13399/leetcode-graphic-answer/master/Best%20Time%20to%20Buy%20and%20Sell%20Stock%20with%20Cooldown.jpg](https://raw.githubusercontent.com/hot13399/leetcode-graphic-answer/master/Best%20Time%20to%20Buy%20and%20Sell%20Stock%20with%20Cooldown.jpg)

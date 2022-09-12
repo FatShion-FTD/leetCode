@@ -461,3 +461,38 @@ public int carFleet(int target, int[] position, int[] speed) {
   return res;
 }
 ```
+
+## 948. Bag of Tokens
+https://leetcode.com/problems/bag-of-tokens/
+
+贪心, 优先挣 score. 只有 power 不够买 score 了, score 挣 power. 
+
+```java
+class Solution {
+    int res = 0;
+    public int bagOfTokensScore(int[] tokens, int power) {
+        // max score
+        // if power >= token[i], 1. power -= token[i], score + 1; 2. do nothing
+        // if score >= 1, 1. power += token[i], score - 1; 2. do nothing
+        // token can only be played once, in any order
+        // greedy: left ptr turn on smallest, right ptr turn off largest
+        if (tokens == null || tokens.length == 0)
+            return 0;
+        
+        Arrays.sort(tokens);            // ascending order
+        int n = tokens.length, res = 0, left = 0, right = n - 1, score = 0;
+        while (left <= right) {
+            if (power >= tokens[left]) {        // always buy smallest
+                res = Math.max(++score, res);
+                power -= tokens[left++];
+            } else if (score > 0) {
+                power += tokens[right--];
+                score --;
+            } else 
+                break;
+        }
+        
+        return res;
+    }
+}
+```

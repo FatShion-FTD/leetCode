@@ -665,6 +665,39 @@ class MyCalendar {
 }
 ```
 
+## 2406. Divide Intervals Into Minimum Number of Groups
+https://leetcode.com/problems/divide-intervals-into-minimum-number-of-groups/
+
+记录 tail num 和 以 tail num 结尾的个数. 注意 特殊情况: 10 = 2, 来 10, floor 为 null, 需要 getOrDefault(end, 0) + 1
+
+```java
+class Solution {
+    public int minGroups(int[][] intervals) {
+        Arrays.sort(intervals, (o1, o2) -> o1[0] == o2[0] ? o1[1] - o2[1] : o1[0] - o2[0]);
+        TreeMap<Integer, Integer> orderedMap = new TreeMap<>();
+        int res = 0;
+        
+        for (int[] interval : intervals) {
+            int start = interval[0], end = interval[1];
+            Integer floor = orderedMap.lowerKey(start);
+            if (floor == null) {
+                // 没有 < end的尾节点, 但是存在同样以 end 结尾的
+                // 10 = 2, 来 10, floor == null, 10 = 3
+                orderedMap.put(end, orderedMap.getOrDefault(end, 0) + 1);    
+                res++;
+            } else {
+                orderedMap.put(floor, orderedMap.get(floor) - 1);
+                if (orderedMap.get(floor) == 0)
+                    orderedMap.remove(floor);
+                orderedMap.put(end, orderedMap.getOrDefault(end, 0) + 1);
+            }
+        }
+        
+        return res;
+    }
+}
+```
+
 ## 659. Split Array into Consecutive Subsequences
 https://leetcode.com/problems/split-array-into-consecutive-subsequences/
 

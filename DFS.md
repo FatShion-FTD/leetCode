@@ -561,3 +561,43 @@ private int countLevel (String s) {
   return s.length() - s.replace("\t", "").length();
 }
 ```
+
+## 2397. Maximum Rows Covered by Columns
+https://leetcode.com/problems/maximum-rows-covered-by-columns/
+
+DFS 查询所有可能 col index 组合, 然后在结尾状态验证: 当 m[row][col] = 1 时, 其 col 必须在 set 中. 如果为 0 则无所谓啦
+
+```java
+int res = 0;
+public int maximumRows(int[][] matrix, int numSelect) {
+  // 1. row only has 0, 2. m[row][col] = 1, col has to be in s. -> m[row][col] == 1, col has to be in s.
+  dfs(matrix, numSelect, 0, new HashSet<>());
+  return res;
+}
+
+private void dfs(int[][] m, int ret, int index, Set<Integer> v) {
+  if (ret == 0 || index == m[0].length) {
+      int covered = 0;
+      for (int i = 0; i < m.length; i++) {
+          boolean isCover = true;
+          for (int j = 0; j < m[0].length; j++) {
+              if (m[i][j] == 1 && !v.contains(j)) {
+                  isCover = false;
+                  break;
+              }
+          }
+          if (isCover) covered ++;
+      }
+      res = Math.max(res, covered);
+      return;
+  }
+  // pick curr col
+  v.add(index);
+  dfs(m, ret - 1, index + 1, v);
+  v.remove(index);
+  
+  // not pick curr col
+  dfs(m, ret, index + 1, v);
+  return;
+}
+```

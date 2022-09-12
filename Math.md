@@ -252,3 +252,31 @@ https://leetcode.com/problems/factorial-trailing-zeroes/
      return res;
  }
 ```
+
+## 667. Beautiful Arrangement II
+https://leetcode.com/problems/beautiful-arrangement-ii/
+
+首先把所有需要的 gap 都加上, 即: Gap 1 - k, 结构: 1 , k + 1, 2, k, 3, k - 1... 然后把剩下的 k + 2 按顺序加上即可
+
+```java
+ public int[] constructArray(int n, int k) {
+     // 1-n must be used
+     // add k's gap first, gap: 1 - k, require number: 1, k + 1, 2, k ...
+     int[] res = new int[n];
+     int lower = 1, upper = k + 1, i = 0;
+     boolean isLower = true;
+     while (lower <= upper) {
+         res[i++] = isLower ? lower : upper;
+         if (isLower)
+             lower++;
+         else 
+             upper--;
+         isLower = !isLower;
+     }
+     int rem = k + 2;
+     while(i < n) {
+         res[i++] = rem++;
+     }
+     return res;
+ }
+```

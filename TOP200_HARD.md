@@ -301,7 +301,7 @@ https://leetcode.com/problems/russian-doll-envelopes/
 ## 1996. The Number of Weak Characters in the Game
 https://leetcode.com/problems/the-number-of-weak-characters-in-the-game/submissions/
 
-上述类似问题, 但是更加trick, 0位单减, 1位单增, 形成Atk从大到小, Def在同Atk下从小到大, 在确保Atk单减的前提下, 则i+1和i一定存在 [i][0] >= [i+1][0]的关系, 保存最大的Def, 如果小于最大Def即weak, 同Atk单增, 确保edge case 如: [1, 4] 和 [1, 10] 
+上述类似问题, 但是更加trick, 0位单减, 1位单增, 形成Atk从大到小, Def在同Atk下从小到大, 在确保Atk单减的前提下, 则i+1和i一定存在 [i][0] >= [i+1][0]的关系, 保存最大的Def, 如果小于最大Def即weak. 同Atk单增, 确保edge case 如: [1, 4] 和 [1, 10] 因为 def 单增, 4, 10, 所以没有weak
 
 ```java
 public int numberOfWeakCharacters(int[][] properties) {
@@ -706,4 +706,45 @@ class Solution {
         list.remove(0);
     }
 }
+```
+
+## 41. First Missing Positive
+https://leetcode.com/problems/first-missing-positive/
+
+原地标记 + 范围确定. 
+范围确定: 明确有效范围在 [1, n], 最大可能的结果是 n + 1;    
+原地标记: 首先将所有无效数字, 原地标记为 n + 1; 其次, 在 nums[i] 有效的情况下, 将 nums[nums[i] - 1] 变为负数 (-1 因为原来的值是[1, n], 在数组中要对应到[0, n-1]), 使用 index 存储信息; 再次遍历, 找到第一个非负的, 其 index + 1 就是第一个不存在的数. 
+
+如: 1,2,3 都存在, 则对应数组 nums[0] - nums[2] 都小于 0, nums[3] > 0, 则 4 = 3 + 1, 是不存在的.
+
+```java
+ public int firstMissingPositive(int[] nums) {
+     // O(n) time, O(1) space
+     // 1. range: [1, n + 1] if all num are [1, n], max result is n + 1
+     // In-place mark, using negative (-), mark all the occured index, until first positive one
+     int n = nums.length;
+     boolean hasOne = false;
+     for (int i = 0; i < n; i++) {
+         if (nums[i] == 1)
+             hasOne = true;
+         if (nums[i] <= 0)
+             nums[i] = n + 1;
+     }
+     if (!hasOne)
+         return 1;
+     
+     for (int i = 0; i < n; i++) {
+         int num = nums[i] > 0 ? nums[i] : -nums[i];
+         if (num <= n) {                           // potential valid index
+             int index = num - 1;
+             if (nums[index] > 0)                      // 0 is not valid  
+                 nums[index] = -nums[index];           // mark index as -
+         }
+     }
+     for (int i = 0; i < n; i++) {
+         if (nums[i] > 0)
+             return i + 1;
+     }
+     return n + 1;
+ }
 ```
