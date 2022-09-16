@@ -1541,3 +1541,33 @@ https://leetcode.com/problems/unique-binary-search-trees/
      return dp[n];
  }
 ```
+
+## 1770. Maximum Score from Performing Multiplication Operations
+https://leetcode.com/problems/maximum-score-from-performing-multiplication-operations/
+
+自底向上, 记忆化DFS, 使用 memo 记录 nums左边界为 p1, multi index 为 p2 时的最大值. 注意求右边的位置即可. 
+
+```java
+class Solution {
+    int[][] memo = new int[1001][1001];
+
+    public int maximumScore(int[] nums, int[] multipliers) {
+        // bottom-up memo DFS
+        return dfs(nums, multipliers, 0, 0);
+    }
+    
+    private int dfs(int[] nums, int[] m, int p1, int p2) {
+        if (p2 >= m.length) 
+            return 0;
+        
+        if (memo[p1][p2] != 0)
+            return memo[p1][p2];
+        
+        int p1End = nums.length - 1 - (p2 - p1);
+        memo[p1][p2] = Math.max(nums[p1] * m[p2] + dfs(nums, m, p1 + 1, p2 + 1),
+                                    nums[p1End] * m[p2] + dfs(nums, m, p1, p2 + 1));
+
+        return memo[p1][p2];
+    }
+}
+```

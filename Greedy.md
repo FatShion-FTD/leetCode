@@ -496,3 +496,50 @@ class Solution {
     }
 }
 ```
+
+## 2007. Find Original Array From Doubled Array
+https://leetcode.com/problems/find-original-array-from-doubled-array/
+
+先统计出现次数, 再从小到大咔嚓数, 一次咔嚓本体 + doubled. 本体没了, 还能继续(是之前被咔嚓的doubled). double 没了, 那就完蛋. 
+
+```java
+class Solution {
+    public int[] findOriginalArray(int[] changed) {
+        // 从小到大, 一次咔嚓俩, 咔嚓光了就行了
+        int n = changed.length;
+        if (n % 2 != 0)
+            return new int[]{};
+        
+        int[] res = new int[n / 2];
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int num : changed) {
+            map.put(num, map.getOrDefault(num, 0) + 1);
+        }
+        
+        Arrays.sort(changed);
+        int i = 0;
+        for (int num : changed) {
+            if (map.isEmpty())
+                break;
+            if(!map.containsKey(num))
+                continue;
+            
+            int doubled = num * 2;
+            map.put(num, map.get(num) - 1);
+            if (map.get(num) == 0)
+                map.remove(num);
+            
+            if (!map.containsKey(doubled))
+                return new int[]{};
+            
+            map.put(doubled, map.get(doubled) - 1);
+            if (map.get(doubled) == 0)
+                map.remove(doubled);
+            
+            res[i++] = num;
+        }
+        
+        return res;
+    }
+}
+```

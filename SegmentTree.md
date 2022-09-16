@@ -1,11 +1,11 @@
 # 线段树
-类似 BST, 但是 存储一个区间, TreeNode 包含4个主要信息:     
+类似 BST, 但是 存储一个区间, 常用于 O(logN) 时间的区间查询, TreeNode 包含4个主要信息:     
 left, right, leftNode, rightNode     
 其中 left 和 right 为区间的左右边界, 我习惯使用 [left, right) 左闭右开区间      
 使用二分的办法 构建, 更新, 查找树     
 ```java
 class Node{
-    int left, right;
+    int left, right, sum;
     Node leftNode, rightNode;
     public Node(int left, int right){
         this.left = left;

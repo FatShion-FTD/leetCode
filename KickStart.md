@@ -26,8 +26,7 @@ class Solution {
             var res = slu.solution();
             System.out.println("Case #%d: %d", i, res);
         }
+        sc.close();
     }
 }
-
-
 ```

@@ -85,3 +85,40 @@ class Solution {
     }
 }
 ```
+
+## 155. Min Stack
+https://leetcode.com/problems/min-stack/
+
+单调最小栈实现. 使用栈, 只有当新值比当前最小值 (minStack.peek) 小, 才压入栈. 当 普通栈 的值和 单调栈栈顶的 值 一样(只比较值), pop 单调栈栈顶.
+
+```java
+class MinStack {
+    Deque<Integer> s;
+    Deque<Integer> minS;
+    
+    public MinStack() {
+        s = new ArrayDeque<>();
+        minS = new ArrayDeque<>();
+    }
+    
+    public void push(int val) {
+        s.push(val);
+        if (minS.isEmpty() || val <= minS.peekFirst())  // 为空 || 新值比当前最小还小, 加入
+            minS.addFirst(val);
+    }
+    
+    public void pop() {
+        if (minS.peekFirst().equals(s.peek()))               // pop element is at top of min Stack, only compare value
+            minS.pollFirst();
+        s.pop();
+    }
+    
+    public int top() {
+        return s.peek();
+    }
+    
+    public int getMin() {
+        return minS.peekFirst();
+    }
+}
+```
