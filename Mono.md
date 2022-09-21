@@ -1,5 +1,7 @@
 # 单调栈/队列
 
+使用栈或队列, 维持其中元素最大或者最小, 使得后续元素可以进行 O(1) 的 peek 快速查询 
+
 例子: 最大队列
 ```java
 Deque<Integer> deque = new ArrayDeque<>();
@@ -120,5 +122,29 @@ class MinStack {
     public int getMin() {
         return minS.peekFirst();
     }
+}
+```
+
+## 503. Next Greater Element II
+https://leetcode.com/problems/next-greater-element-ii/
+
+环查找 + 单调栈. 环 = 遍历两次. 单调栈记录所有的 index, 如果栈顶位置的元素 小于 当前元素, 则 在栈顶位置记录最近的最大元素
+
+```java
+public int[] nextGreaterElements(int[] nums) {
+    if (nums == null || nums.length == 0)
+        return new int[0];
+    
+    int n = nums.length;
+    Deque<Integer> stack = new ArrayDeque<>();      // 最大单调栈, 栈底最大
+    int[] res = new int[n];
+    Arrays.fill(res, -1);
+    for (int i = 0; i < 2 * n; i++) {
+        while (!stack.isEmpty() && nums[stack.peek() % n] < nums[i % n]) {  // 栈顶位置元素 < 当前元素
+            res[stack.pop() % n] = nums[i % n]; 
+        }
+        stack.push(i);
+    }
+    return res;
 }
 ```

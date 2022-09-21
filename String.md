@@ -533,3 +533,81 @@ class Solution {
     }
 }
 ```
+
+## 336. Palindrome Pairs
+https://leetcode.com/problems/palindrome-pairs/
+
+寻找 palindrome pair, 存在3种情况: 
+1. 空 + 任意palin
+2. CAT + TAC, 等长完美palin
+3. CATXXX + TAC / CAT + XXXTAC, 其中XXX为 palin 
+
+使用 map 实现高效 index 查询, 存入所有 reversed string, 则使用 words[i] 存正序, map 存逆序, 实现快速逆序    
+
+
+```java
+class Solution {    
+    public List<List<Integer>> palindromePairs(String[] words) {
+        // 1: "" + palin
+        // 2: CAT + TAC where same length
+        // 3: CATXXX + TAC, where XXX is palin
+        // 4: CAT + XXXTAC where XXX is palin
+        if (words == null || words.length == 0)
+            return null;
+        
+        List<List<Integer>> res = new ArrayList<>();
+        int n = words.length;
+        Map<String, Integer> map = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            map.put(new StringBuilder(words[i]).reverse().toString(), i);
+        }
+        
+        // case 1: "" + palin
+        if (map.containsKey("")) {
+            int emptyIdx = map.get("");
+            for (int i = 0; i < n; i++) {
+                if (i == emptyIdx) continue;
+                if (isPalin(words[i])) {
+                    res.add(Arrays.asList(i, emptyIdx));
+                    res.add(Arrays.asList(emptyIdx, i));
+                }
+            }
+        }
+        
+        // case 2: check reverse
+        for (int i = 0; i < n; i++) {
+            Integer reversed = map.get(words[i]);
+            if (reversed != null && i != reversed)
+                res.add(Arrays.asList(i, reversed));
+        }
+        
+        // case 3 + 4: 拆分
+        for (int i = 0; i < n; i++) {
+            String s = words[i];
+            for (int j = 1; j < s.length(); j++) {
+                String right = s.substring(j);
+                String left = s.substring(0, j);
+                
+                if (map.containsKey(left) && isPalin(right)) {
+                    res.add(Arrays.asList(i, map.get(left)));
+                }
+                
+                if (map.containsKey(right) && isPalin(left)) {
+                    res.add(Arrays.asList(map.get(right), i));
+                }
+            }
+        }
+        
+        return res;
+    }
+    
+    private boolean isPalin(String s) {
+        int left = 0, right = s.length() - 1;
+        while (left <= right) {
+            if (s.charAt(left++) != s.charAt(right--))
+                return false;
+        }
+        return true;
+    }
+}
+```

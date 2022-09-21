@@ -1571,3 +1571,29 @@ class Solution {
     }
 }
 ```
+
+## 718. Maximum Length of Repeated Subarray
+https://leetcode.com/problems/maximum-length-of-repeated-subarray/
+
+求最长公共子数组, DP. dp[i][j] 表示 nums1 的 0-i 区间 和 nums2 的 0-j 区间 的 公共子区间   
+dp[i][j] = dp[i-1][j-1] + 1 if nums1[i-1] == nums2[j-1].
+
+```java
+ public int findLength(int[] nums1, int[] nums2) {
+     if (nums1 == null || nums1.length == 0 || nums2 == null || nums2.length == 0)
+         return 0;
+     
+     int n = nums1.length, m = nums2.length, res = 0;
+     int[][] dp = new int[n + 1][m + 1];
+     for (int i = 1; i <= n; i++) {
+         for (int j = 1; j <= m; j++) {
+             if (nums1[i - 1] == nums2[j - 1]) {
+                 dp[i][j] = dp[i - 1][j - 1] + 1;
+                 res = Math.max(res, dp[i][j]);
+             } else 
+                 dp[i][j] = 0;
+         }
+     }
+     return res;
+ }
+```

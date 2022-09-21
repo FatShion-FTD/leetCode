@@ -40,3 +40,32 @@ public class Codec {
     }
 }
 ```
+
+## 163. Missing Ranges
+https://leetcode.com/problems/missing-ranges/
+
+**字节原题**给定范围 和 数组, 求未出现的范围. 复杂边界条件: 
+1. 初始下界为 lower, 更新后的下界变为 num[i] + 1, 因为 num 出现过了; 
+2. 构建区间时, 上界为 nums[i] - 1, 同理; 
+3. 末尾时, 上界为: upper, 因为是闭区间
+
+```java
+public List<String> findMissingRanges(int[] nums, int lower, int upper) {
+   List<String> res = new ArrayList<>();
+   int prev = lower, n = nums.length;
+   for (int i = 0; i <= n; i++) {
+       int curr = i < n ? nums[i] : upper + 1;
+       if (prev <= curr - 1) {    
+           res.add(format(prev, curr - 1));
+       }
+       prev = curr + 1;
+   }
+   return res;
+}
+
+private String format(int lower, int upper) {
+   if (lower == upper)
+       return "" + lower;
+   return lower + "->" + upper;
+}
+```
