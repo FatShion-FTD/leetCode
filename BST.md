@@ -548,3 +548,39 @@ public List<List<Integer>> verticalOrder(TreeNode root) {
   return res;
 }
 ```
+
+## 222. Count Complete Tree Nodes
+https://leetcode.com/problems/count-complete-tree-nodes/
+
+在 logN 时间内统计 完全二叉树中 nodes 数量. 使用高度判断左右子树是否为完美二叉树进行快速查找.
+1. 首先计算树高
+2. 每次迭代走一层: 如果当前 node.right 的高度 == h - 1, 说明 node.left 所在的左子树 是 完美二叉树, 则加入 其左子树的所有 nodes: 2 ^ h, 并向右搜索; 如果右子树高度不足h - 1, 说明右子树当前为 完美二叉树, 加入 2 ^ (h-1), 并向左搜索.
+
+```java
+public int countNodes(TreeNode root) {
+  if (root == null)
+      return 0;
+  
+  int h = getHeight(root), res = 0;
+  while (root != null) {
+      if (getHeight(root.right) == h - 1) {       // 能抵达最后一层
+          res += 1 << h;          // 加入完整的整个左子树的nodes
+          root = root.right;
+      } else {                    // 不能抵达最后一层
+          res += 1 << (h-1);      // 加入 right node 的完整子树 nodes
+          root = root.left;
+      }
+      h--;
+  }
+  return res;
+}
+
+private int getHeight(TreeNode node) {
+  int res = -1;
+  while (node != null) {
+      res++;
+      node = node.left;
+  }
+  return res;
+}
+```

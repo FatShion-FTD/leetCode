@@ -331,9 +331,14 @@ MONO: 每次加入前, 去掉所有比 当前小的 值.
  }
 ```
 
-Maximum Subarray: https://leetcode.com/problems/maximum-subarray/
+## Maximum Subarray
+https://leetcode.com/problems/maximum-subarray/
 
-转移函数: $dp[i] = max(dp[i-1] + nums[i], nums[i]);$    同时使用res来保存到每一步为止的最大值
+最基础的Kadane 算法, 使用DP的办法, 记录到 i 为止的子数组的最优子状态. 从 O(N^2) 变为 O(N)
+
+转移函数: $dp[i] = max(dp[i-1] + nums[i], nums[i]);$    
+
+同时使用res来保存到每一步为止的最大值
 
 ```java
 public int maxSubArray(int[] nums) {
@@ -1596,4 +1601,58 @@ dp[i][j] = dp[i-1][j-1] + 1 if nums1[i-1] == nums2[j-1].
      }
      return res;
  }
+```
+
+## 2272. Substring With Largest Variance
+https://leetcode.com/problems/substring-with-largest-variance/
+
+pair 对应 + 高级版本的Kadane 算法. 
+
+什么是Kadane, O(n)一次扫描数组, 并记录以扫描点结尾的子数组信息. 使用最优子结构, 则以 i + 1 结尾的子数组应该基于 以 i 结尾的子数组.
+
+两次遍历all char, 获取所有 char pair. 针对每个pair, 一个 char freq a 为增长, 另一个 char freq b 为减少, 记录到 i 为止得到子数组信息.
+
+如果 c == a, 则增长++; 如果 c == b, 则减少--, 并同时减少其上限, 作为判断是否还存在后续的标准; 
+
+```java
+class Solution {
+    public int largestVariance(String s) {
+        // dp 从 i 到 j 的最大
+        if (s == null || s.length() == 0)
+            return 0;
+        
+        int[] freq = new int[26];
+        for (char c : s.toCharArray()) {
+            freq[c - 'a']++;
+        }
+        
+        int n = s.length(), res = 0;
+        for (int i = 0; i < 26; i++) {
+            for (int j = 0; j < 26; j++) {
+                int aMaxFreq = freq[i], bMaxFreq = freq[j];
+                if (i == j || aMaxFreq == 0 || bMaxFreq == 0)   
+                    continue;
+                
+                int aCurFreq = 0, bCurFreq = 0;
+                for (char c : s.toCharArray()) {
+                    if (c - 'a' == j)
+                        bCurFreq++;
+                    
+                    if (c - 'a' == i) {
+                        aCurFreq++;
+                        aMaxFreq--;
+                    }
+                    
+                    if (aCurFreq > 0)   // a 存在子数组中
+                        res = Math.max(res, bCurFreq - aCurFreq);
+                    
+                    if (aCurFreq > bCurFreq && aMaxFreq >= 1) {
+                        aCurFreq = bCurFreq = 0;
+                    }
+                }   
+            }
+        }
+        return res;
+    }
+}
 ```

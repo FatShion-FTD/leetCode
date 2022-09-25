@@ -100,3 +100,45 @@ private int findSum (int[] colSum, int k) {
 }
 ```
 
+## 2420. Find All Good Indices
+https://leetcode.com/problems/find-all-good-indices/
+
+以 [k, n-k) 为中心, 左侧 k 个数字要求单减, 右侧 k 个数字要求单增.    
+使用 prefixLen + suffixLen 实现快速访问趋势. 前后缀思想类似Kadane, 如果当前 num >= prev num, 则 在单增中, dp[i] = dp[i-1] + 1, 否则为 1.
+
+然后遍历 + 快速访问即可
+
+```java
+public List<Integer> goodIndices(int[] nums, int k) {
+    // i in [k, n-k), 在该范围内， 找小山谷
+    List<Integer> res = new ArrayList<>();
+    
+    if (nums == null || nums.length == 0)
+        return res;
+    
+    int n = nums.length;
+    int[] nonInc = new int[n+1];
+    int[] nonDec = new int[n+1];
+    
+    Arrays.fill(nonInc, 1);
+    Arrays.fill(nonDec, 1);
+    
+    // 非增前缀长度和
+    for (int i = 1; i < n; i++) {
+        if (nums[i-1] >= nums[i])
+            nonInc[i] = nonInc[i-1]  + 1;
+    }
+    // 非减后缀长度和
+    for (int i = n - 2; i >= 0; i--) {
+        if (nums[i+1] >= nums[i]) 
+            nonDec[i] = nonDec[i + 1] + 1;
+    }
+    
+    for (int i = k; i < n - k; i++) {
+        if (nonInc[i-1] >= k && nonDec[i+1] >= k)
+            res.add(i);
+    }
+
+    return res;
+}
+```

@@ -215,3 +215,26 @@ https://leetcode.com/problems/maximum-rows-covered-by-columns/
      return res;
  }
 ```
+
+## 1680. Concatenation of Consecutive Binary Numbers
+https://leetcode.com/problems/concatenation-of-consecutive-binary-numbers/
+
+快速验证一个数字 N 是否是2的平方: N & (N - 1) == 0. 每次向左位移 len 个bit, 然后通过 | 操作在数字最后 len 位加上 N. 通过快速验证 N 是否为 2 的平方, 可以判断 len 是否需要增加位数
+
+
+```java
+class Solution {
+    final static int MOD = 1000000007;;
+    
+    public int concatenatedBinary(int n) {
+        // 快速查询 n 是否是2的平方, n & (n-1) == 0?
+        long res = 0, len = 0;
+        for (int i = 1; i <= n; i++) {
+            if ((i & (i-1)) == 0)         // 
+                len++;
+            res = ((res << len) | i) % MOD;
+        }
+        return (int) res;
+    }
+}
+```
