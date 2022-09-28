@@ -1,16 +1,14 @@
 # QuickSort 快排
 选定一个 pivot, 把所有小于 pivot 的放左边, 大于的放右边
 
+
+
 # QuickSelect   快速选择
 
+快速选择是快排的一种变形, 用于在快排过程中找到指定的元素
 
-
-Kth Largest Element in an Array: https://leetcode.com/problems/kth-largest-element-in-an-array/
-
-https://leetcode.com/problems/kth-largest-element-in-an-array/discuss/60294/Solution-explained
-
-**** 没搞懂呢 ****
-
+## Kth Largest Element in an Array
+https://leetcode.com/problems/kth-largest-element-in-an-array/
 
 四点: 1. 使用 
 

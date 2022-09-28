@@ -503,7 +503,8 @@ public int findMaxForm(String[] strs, int m, int n) {
 }
 ```
 
-983. Minimum Cost For Tickets: https://leetcode.com/problems/minimum-cost-for-tickets/
+## 983. Minimum Cost For Tickets
+https://leetcode.com/problems/minimum-cost-for-tickets/
 
 强化版 coin change, 依然使用 i 从 0 到 最大值的每个中间状态进行DP, 注意三点: 
 
@@ -702,7 +703,8 @@ https://leetcode.com/problems/longest-ideal-subsequence/
 ```
 
 
-Longest Palindromic Substring: https://leetcode.com/problems/longest-palindromic-substring/
+## Longest Palindromic Substring
+https://leetcode.com/problems/longest-palindromic-substring/
 
 重新构建string时, len+1 原因是len最小为0时, 实际长度为1, 转移方程: 
 
@@ -820,7 +822,8 @@ public int countOrders(int n) {
 
 
 ### Greedy DP
-Minimum Domino Rotations For Equal Row: https://leetcode.com/problems/minimum-domino-rotations-for-equal-row/
+## Minimum Domino Rotations For Equal Row
+https://leetcode.com/problems/minimum-domino-rotations-for-equal-row/
 
 记录每个数字出现次数和相同时的出现次数, 遍历所有数字, 尝试交换: topSet[i] + botSet[i] - SameSet[i] == len 则满足交换条件, 返回最小的交换次数
 
@@ -1160,7 +1163,7 @@ https://leetcode.com/problems/ugly-number-ii/
      for(int i = 1; i < n; i++){
          min = Math.min(ugly[index2] * 2, 
             Math.min(ugly[index3] * 3, ugly[index5] * 5));
-         ugly[i] = num;
+         ugly[i] = min;
          if(min == mul2)    index2++;
          if(min == mul3)    index3++;
          if(min == mul5)    index5++;
@@ -1652,6 +1655,46 @@ class Solution {
                 }   
             }
         }
+        return res;
+    }
+}
+```
+
+## 87. Scramble String
+https://leetcode.com/problems/scramble-string/
+
+top-down DP. 从 s1 开始, 遍历所有分开的点, 左侧为: s1.substring(0, i) 右侧为: s1.substring(i), 在每个点都有两个选择, 换和不换. 不换则 s2 也用相同办法分开, 换则 s2.substring(n-i) 和 s2.substring(0, n-i). 并使用 序列化 存进 map 实现 memo. 
+
+```java
+class Solution {
+    Map<String, Boolean> map = new HashMap<>();
+    
+    public boolean isScramble(String s1, String s2) {
+        if (s1.equals(s2) || s1.isEmpty())
+            return true;
+        return dfs(s1, s2);
+    }
+    
+    private boolean dfs(String s1, String s2) {
+        if (s1.equals(s2))
+            return true;
+        
+        if (s1.length() <= 1)
+            return false;
+        
+        int n = s1.length();
+        String memo = s1 + "#" + s2;
+        if (map.containsKey(memo))
+            return map.get(memo);
+        
+        boolean res = false;
+        for (int i = 1; i < n; i++) {
+            res |= dfs(s1.substring(0, i), s2.substring(0, i)) && dfs(s1.substring(i), s2.substring(i));
+            res |= dfs(s1.substring(0, i), s2.substring(n - i)) && dfs(s1.substring(i), s2.substring(0, n - i));
+            if (res)
+                break;
+        }
+        map.put(memo, res);
         return res;
     }
 }
