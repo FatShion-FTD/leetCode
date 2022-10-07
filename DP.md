@@ -702,6 +702,37 @@ https://leetcode.com/problems/longest-ideal-subsequence/
  }
 ```
 
+# Palindrome SubSeq/String
+## 516. Longest Palindromic Subsequence
+https://leetcode.com/problems/longest-palindromic-subsequence/
+
+最长 palin 子序列. dp[i][j] 表示以 i 开头, j 结尾的子序列中的 palin 长度. 三种转移:
+1. i 到 i, dp[i][i] = 1, 表示单个char, 是 palin
+2. dp[i][j] = dp[i + 1][j - 1] + 2 当 arr[i] == arr[j]
+3. dp[i][j] = max(dp[i + 1][j], dp[i][j - 1]) 表示从 i-1 到 j 和 i 到 j+1 的长度中继承更长的 subseq.
+
+```java
+ public int longestPalindromeSubseq(String s) {
+     if (s == null || s.length() == 0)
+         return 0;
+     
+     int n = s.length(), res = 1;
+     int[][] dp = new int[n + 1][n + 1];
+     for (int i = n - 1; i >= 0; i--) {
+         dp[i][i] = 1;
+         for (int j = i + 1; j < n; j++) {
+             if (s.charAt(i) == s.charAt(j)) {
+                 dp[i][j] = dp[i + 1][j - 1] + 2;
+             } else {
+                 dp[i][j] = Math.max(dp[i + 1][j], dp[i][j - 1]);
+             }
+             res = Math.max(res, dp[i][j]);
+         }
+     }
+     
+     return res;
+ }
+```
 
 ## Longest Palindromic Substring
 https://leetcode.com/problems/longest-palindromic-substring/
@@ -1698,4 +1729,38 @@ class Solution {
         return res;
     }
 }
+```
+
+## 1155. Number of Dice Rolls With Target Sum
+https://leetcode.com/problems/number-of-dice-rolls-with-target-sum/
+
+记忆化 + DFS = DP. dp[i][j] 表示 第 i 个骰子, 总和为 j. bottom-up 更新. 当且仅当 总和 为 target, 设为 1.
+
+```java
+ final static int MOD = 1000000007;
+ public int numRollsToTarget(int n, int k, int target) {
+     // n dice, k faces from [1, k]
+     // dp[i][j] - the combinations at i dice, j is the sum
+     int[][] dp = new int[n + 1][target + 1];
+     for (int[] arr : dp)
+         Arrays.fill(arr, -1);
+     
+     dfs(dp, 0, n, k, target, 0);
+     return dp[0][0];
+ }
+ 
+ private int dfs(int[][] dp, int start, int n, int k, int target, int sum) {
+     if (start == n)
+         return sum == target ? 1 : 0;
+     
+     if (dp[start][sum] != -1)
+         return dp[start][sum];
+     
+     int res = 0;
+     for (int i = 1; i <= Math.min(k, target - sum); i++) {
+         res = (res + dfs(dp, start + 1, n, k, target, sum + i)) % MOD;
+     }
+     dp[start][sum] = res;
+     return res;
+ }
 ```

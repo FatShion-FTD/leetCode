@@ -665,6 +665,34 @@ class MyCalendar {
 }
 ```
 
+## 732. My Calendar III
+https://leetcode.com/problems/my-calendar-iii/
+
+扫描线算法, 核心在于: 0和的差分数组, 这个数组中的事件分为入边和出边, 在入边时刻 +1, 在出边时刻 -1, 其总和为0. 在扫描线的每个位置, 可以得到 sum pre-interval 的信息.
+
+将 interval 抽象为 一个在数轴上的区间, 进入区间为 入边, 出区间为 出边.   
+
+```java
+class MyCalendarThree {
+    TreeMap<Integer, Integer> tm;
+        
+    public MyCalendarThree() {
+        tm = new TreeMap<>();
+    }
+    
+    public int book(int start, int end) {
+        tm.put(start, tm.getOrDefault(start, 0) + 1); // 入边
+        tm.put(end, tm.getOrDefault(end, 0) - 1); // 出边
+        int res = 0, cur = 0;
+        for (int val : tm.values()) {
+            cur += val;
+            res = Math.max(res, cur);
+        }
+        return res;
+    }
+}
+```
+
 ## 2406. Divide Intervals Into Minimum Number of Groups
 https://leetcode.com/problems/divide-intervals-into-minimum-number-of-groups/
 

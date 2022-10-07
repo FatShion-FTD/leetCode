@@ -142,3 +142,39 @@ public List<Integer> goodIndices(int[] nums, int k) {
     return res;
 }
 ```
+
+## 1352. Product of the Last K Numbers
+https://leetcode.com/problems/product-of-the-last-k-numbers/
+
+前缀乘积 + 特殊情况冲洗. 简单的前缀乘积, 但是当 0 来了, 要把前缀清空, 
+1. 因为不清空, 纯维护会爆栈 
+2. 任何包含 0 的乘积都是 0, 则在retrieve的时候, 如果 k > size 则返回 0 即可
+
+```java
+class ProductOfNumbers {
+    List<Integer> products;
+    public ProductOfNumbers() {
+        products = new ArrayList<>();
+        products.add(1);
+    }
+    
+    public void add(int num) {
+        if (num == 0) {
+            products.clear();
+            products.add(1);
+            return;
+        }
+        
+        if (products.isEmpty()) {
+            products.add(num);
+            return;
+        }
+            
+        products.add(products.get(products.size() - 1) * num);
+    }
+    
+    public int getProduct(int k) {
+        return k < products.size() ? products.get(products.size() - 1) / products.get(products.size() - k - 1) : 0;
+    }
+}
+```

@@ -410,3 +410,90 @@ class Solution {
     }
 }
 ```
+
+## 218. The Skyline Problem
+https://leetcode.com/problems/the-skyline-problem/
+
+找建筑物发生高度变化边及其高度.
+1. 使用 set 找出所有边的 index, 并对所有边进行从左到右排序
+2. 离散化建表, 用于记录每条边 原index 所对应的 0-index, 用于在 第 4 步和 新高度对齐
+3. 将建筑物按照高度排序, 从高到低
+4. 创建新的高度 array
+5. 遍历每个建筑, 找到其左右边, 更新其中间的高度, 使用unionFind实现快速跳跃, 从左边界找到有效的右边界, 有效右边界: 
+
+注意: 绝对不能使用 按秩排序, 因为这里的 UnionFind 我们需要严格的前后(从左到右)关系, 即从 左边, 在 O(1) 内, 找到其联通的右边. 
+
+```java
+class Solution {
+    public List<List<Integer>> getSkyline(int[][] buildings) {
+        // get all edges
+        Set<Integer> edgeSet = new HashSet<>();
+        for (int[] b : buildings) {
+            edgeSet.add(b[0]);
+            edgeSet.add(b[1]);
+        }
+    
+        // edges in order
+        Integer[] edges = edgeSet.toArray(new Integer[edgeSet.size()]);
+        Arrays.sort(edges);
+        
+        Map<Integer, Integer> edgeMap = new HashMap<>();
+        for (int i = 0; i < edges.length; i++) {
+            edgeMap.put(edges[i], i);
+        }
+        
+        Arrays.sort(buildings, (o1, o2) -> o2[2] - o1[2]);  // 高度, 从高到低
+        
+        int n = edges.length;
+        UnionFind uf = new UnionFind(n);
+        int[] heights = new int[n];
+        
+        for (int[] b : buildings) {
+            int leftEdge = b[0], rightEdge = b[1], h = b[2];
+            int leftIndex = edgeMap.get(leftEdge), rightIndex = edgeMap.get(rightEdge);
+            // 不使用 uf 的话, 原操作
+            // for (int i = leftIndex; i <= rightIndex; i++) {
+            //     height[i] = h;
+            // }
+            while (leftIndex < rightIndex) {        // 把所有在左右中间的, 连通起来
+                leftIndex = uf.find(leftIndex);
+                if (leftIndex < rightIndex) {
+                    uf.union(leftIndex, rightIndex);
+                    heights[leftIndex] = h;
+                    leftIndex++;
+                }
+            }
+        }
+        List<List<Integer>> res = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if (i == 0 || heights[i] != heights[i-1])
+                res.add(List.of(edges[i], heights[i]));
+        }   
+        return res;
+    }
+    
+    class UnionFind {
+        int[] p;
+        int[] r;
+        
+        public UnionFind(int n) {
+            p = new int[n];
+            r = new int[n];
+            for (int i = 0; i < n; i++) {
+                p[i] = i;
+                r[i] = 0;
+            }
+        }
+        
+        public int find(int x) {
+            if (p[x] == x)
+                return x;
+            return p[x] = find(p[x]);
+        }
+
+        public void union(int x, int y) {
+            p[x] = p[y];
+        }
+    }
+}
+```
