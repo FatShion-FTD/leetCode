@@ -543,3 +543,52 @@ class Solution {
     }
 }
 ```
+## 1328. Break a Palindrome
+https://leetcode.com/problems/break-a-palindrome/
+
+先在前半段找个 char 换成 a; 找不到了说明 左右两半全都是 a, 则把最后一个换成 b
+
+```java
+ public String breakPalindrome(String p) {
+     // 换一个 char, 字典序最小, 非palin
+     int n = p.length();
+     if (n == 1)
+         return "";
+     
+     int half = n / 2;
+     StringBuilder sb = new StringBuilder(p);
+     // 在前半段找第一个比 a 大的, 换了即可
+     for (int i = 0; i < half; i++) {
+         if (sb.charAt(i) > 'a') {
+             sb.setCharAt(i, 'a');
+             return sb.toString();
+         }
+     }
+     // 前半段都没比 a 大的, 则 是aaaaaa, 把最后一个换成 b 即可
+     sb.setCharAt(sb.length() - 1, 'b');
+     return sb.toString();
+ }
+```
+
+## 334. Increasing Triplet Subsequence
+https://leetcode.com/problems/increasing-triplet-subsequence/
+
+找两个最小的值, 再找一个比他们大的. 注意要更新前两个最小
+
+```java
+public boolean increasingTriplet(int[] nums) {
+  // 找最小和第二小的数, 再找一个比他们大的就行
+  int first = Integer.MAX_VALUE;
+  int second = Integer.MAX_VALUE;
+  for (int num : nums) {
+      if (num < first) {
+          first = num;
+      } else if (num > first && num < second) {
+          second = num;
+      } else if (num > second){
+          return true;
+      }
+  }
+  return false;
+}
+```

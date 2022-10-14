@@ -1764,3 +1764,46 @@ https://leetcode.com/problems/number-of-dice-rolls-with-target-sum/
      return res;
  }
 ```
+
+## 2435. Paths in Matrix Whose Sum Is Divisible by K
+https://leetcode.com/problems/paths-in-matrix-whose-sum-is-divisible-by-k/
+
+考虑 取模 的分配律: (a + b) % k = (a % k + b % k) % k.    
+使用三维DP, **多考虑一个在当前位置, 余数为 mod 时候的路径数量**即可.
+
+```java
+class Solution {
+    final static int MOD = 1000000007;
+    int k = 0;
+    Integer[][][] dp; 
+    
+    
+    public int numberOfPaths(int[][] grid, int k) {
+        int m = grid.length, n = grid[0].length;
+        this.k = k;
+        dp = new Integer[m][n][k];
+        return dfs(0, 0, 0, m, n, grid);
+    }
+    
+    private int dfs(int row, int col, int mod, int m, int n, int[][] grid) {
+        if (row >= m || col >= n)
+            return 0;
+        
+        if (row == m - 1 && col == n - 1) {
+            if ((mod + grid[row][col]) % k == 0)
+                return 1;
+            
+            return 0;
+        }
+        
+        if (dp[row][col][mod] != null)
+            return dp[row][col][mod];
+        
+        dp[row][col][mod] = 0;
+        dp[row][col][mod] = (dp[row][col][mod] + dfs(row + 1, col, (mod + grid[row][col]) % k, m, n, grid)) % MOD;
+        dp[row][col][mod] = (dp[row][col][mod] + dfs(row, col + 1, (mod + grid[row][col]) % k, m, n, grid)) % MOD;
+        
+        return dp[row][col][mod];
+    }
+}
+```

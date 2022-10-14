@@ -693,6 +693,39 @@ class MyCalendarThree {
 }
 ```
 
+## 2434. Using a Robot to Print the Lexicographically Smallest String
+https://leetcode.com/problems/using-a-robot-to-print-the-lexicographically-smallest-string/
+
+mono stack + treemap. 给一个 String s, 每次从 s 的头拿走一个放到 stack 里, 求最小字典序排列.    
+需要最小字典序, 则需要储存 有序的char 信息, 使用 treemap 快速访问最小字符   
+每次都将当前字符压入 stack, 如果 后续存在更小的 字符, 则说明当前字符需要压入, 直到最小的字符到来. 当最小的字符到来时, pop, 直到后续又有更小的字符.
+
+```java
+public String robotWithString(String s) {
+  TreeMap<Integer, Integer> map = new TreeMap<>();
+  Deque<Integer> stack = new ArrayDeque<>();
+  StringBuilder sb = new StringBuilder();
+  for (char c : s.toCharArray()) {
+      map.put(c - 'a', map.getOrDefault(c - 'a', 0) + 1);
+  }
+  for (char c : s.toCharArray()) {
+      map.put(c - 'a', map.get(c - 'a') - 1);
+      if (map.get(c - 'a') == 0)
+          map.remove(c - 'a');
+      
+      stack.push(c - 'a');
+      while (!stack.isEmpty() && !map.isEmpty() && stack.peek() <= map.firstKey()) {    // 当前字符是 最小的
+          sb.append((char)(stack.pop() + 'a'));
+      }
+  }
+  
+  while (!stack.isEmpty()) {
+      sb.append((char)(stack.pop() + 'a'));
+  }
+  return sb.toString();
+}
+```
+
 ## 2406. Divide Intervals Into Minimum Number of Groups
 https://leetcode.com/problems/divide-intervals-into-minimum-number-of-groups/
 
@@ -772,5 +805,82 @@ public boolean isPossible(int[] nums) {
   }
   
   return true;
+}
+```
+
+
+## 716. Max Stack
+https://leetcode.com/problems/max-stack/
+
+
+
+```java
+class MaxStack {
+
+    Node head;
+    Node tail;
+    TreeMap<Integer, List<Node>> map;
+    
+    public MaxStack() {
+        head = new Node(0);
+        tail = new Node(0);
+        head.next = tail;
+        tail.pre = head;
+        map = new TreeMap<>();
+    }
+    
+    public void push(int x) {
+        Node newNode = new Node(x);
+        newNode.pre = tail.pre;
+        newNode.next = tail;
+        tail.pre.next = newNode;
+        tail.pre = newNode;
+        if(!map.containsKey(x))    map.put(x, new ArrayList<Node>());
+        map.get(x).add(newNode);
+    }
+    
+    public int pop() {
+        int value = tail.pre.val;
+        removeNode(tail.pre);
+        int listSize = map.get(value).size();
+        map.get(value).remove(listSize - 1);
+        if(listSize == 1)    map.remove(value);
+        return value;
+    }
+    
+    public int top() {
+        return tail.pre.val;
+    }
+    
+    public int peekMax() {
+        return map.lastKey();
+    }
+    
+    public int popMax() {
+        int maxVal = map.lastKey();
+        int listSize = map.get(maxVal).size();
+        Node node = map.get(maxVal).remove(listSize - 1);
+        removeNode(node);
+        if(listSize == 1)    map.remove(maxVal);
+        return maxVal;
+    }
+    
+    private void removeNode(Node n){
+        Node preNode = n.pre;
+        Node nextNode = n.next;
+        preNode.next = nextNode;
+        nextNode.pre = preNode;
+    }
+    
+    class Node{
+        Node pre;
+        Node next;
+        int val;
+        public Node(int x){
+            this.val = x;
+            this.pre = null;
+            this.next = null;
+        }
+    }
 }
 ```
