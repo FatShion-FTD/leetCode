@@ -1807,3 +1807,92 @@ class Solution {
     }
 }
 ```
+## 1531. String Compression II
+https://leetcode.com/problems/string-compression-ii/
+
+思考路线: 为什么DP? 因为 1. 存在删除状态和未删除状态. 2. 存在 从 0 到 i 的信息       
+几维DP? 2维, 因为删除操作始终发生在 0 到 i, 还有个删了多少次的操作      
+转移函数: 直接删除则 dp[i][j] = dp[i-1][j-1]         
+复杂情况的转移: 从当前位置往回找, 把所有不同的字符删了, 然后沿途更新       
+
+```java
+public int getLengthOfOptimalCompression(String s, int k) {
+  // dp[i][k]  到 i 为止, 删 k 个时候的最短
+  // 如果直接删当前的, dp[i][k] = dp[i-1][k-1]
+  // 从当前 char 往前找到 index-0, 把中间不同的删了, 看看能组成的长度, 并更新相应位置的状态
+  int n = s.length();
+  int[][] dp = new int[n + 1][k + 1];
+  for (int i = 0; i <= n; i++) {
+      for (int j = 0; j <= k; j++) {
+          dp[i][j] = 300;
+      }
+  }
+  
+  dp[0][0] = 0;
+  for (int i = 1; i <= n; i++) {
+      for (int j = 0; j <= k; j++) {
+          // 从当前为止找到0, 看下删掉的中间不同的, 到每个为止时候
+          int cnt = 0, del = 0;
+          for (int l = i; l >= 1; l--) {
+              if (s.charAt(l - 1) == s.charAt(i - 1))
+                  cnt++;
+              else 
+                  del++;
+              if (j - del >= 0)   // 删除次数小于当前状态删除次数
+                  dp[i][j] = Math.min(dp[i][j], 
+                                      dp[l-1][j-del] + 1 + getNumLen(cnt));
+          }
+          if (j > 0)  // 直接删除, 直接继承
+              dp[i][j] = Math.min(dp[i][j], dp[i-1][j-1]);
+      }
+  }
+  
+  return dp[n][k];
+}
+
+private int getNumLen(int cnt) {
+  return cnt >= 100 ? 3 : cnt >= 10 ? 2 : cnt >= 2 ? 1 : 0;
+}
+```
+
+## 1335. Minimum Difficulty of a Job Schedule
+https://leetcode.com/problems/minimum-difficulty-of-a-job-schedule/
+
+```java
+int n;
+public int minDifficulty(int[] jobDifficulty, int d) {
+  // 存在依赖关系, 一天至少一个活
+  // 每天的diffculty是当天最难的那个
+  // 把任务 切 d-1 刀, 让每个部分的最大值 的 和 最小
+  // 两个状态: 剩余刀数 和 砍的位置
+  this.n = jobDifficulty.length;
+  if (d > n)
+      return -1;
+  
+  int[][] dp = new int[n + 1][d + 1];
+  for (int[] a : dp)
+      Arrays.fill(a, -1);
+  
+  return dfs(d, 0, jobDifficulty, dp);
+}
+
+private int dfs(int remainCut, int startIndex, int[] jobDifficulty, int[][] dp) {
+  if (remainCut == 0 && startIndex == n)  // 抵达终点
+      return 0;
+  if (remainCut == 0 || startIndex == n)  // 越界搜索
+      return Integer.MAX_VALUE;
+  if (dp[startIndex][remainCut] != -1)
+      return dp[startIndex][remainCut];
+  
+  int max = jobDifficulty[startIndex];     // 记录最大难度
+  int res = Integer.MAX_VALUE;
+  
+  for (int i = startIndex; i < n; i++) {
+      max = Math.max(max, jobDifficulty[i]);     // 更新最大难度
+      int t = dfs(remainCut - 1, i + 1, jobDifficulty, dp);   // 在 i 处砍下 1 刀
+      if (t != Integer.MAX_VALUE)                 // 砍的有效, 更新当前位置的最小值
+          res = Math.min(res, t + max);
+  }
+  return dp[startIndex][remainCut] = res;
+}
+```

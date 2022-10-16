@@ -280,3 +280,21 @@ https://leetcode.com/problems/beautiful-arrangement-ii/
      return res;
  }
 ```
+
+## 2439. Minimize Maximum of Array
+https://leetcode.com/problems/minimize-maximum-of-array/
+
+intuition 是平均值, 没错. 同时因为操作是把后面的值往前挪, 则最终数组一定 non-incr. 
+
+使用前缀和计算 max 前缀平均值, 可以包括第一个值最大(后面值小了); 如果后面的值大了, 则可以通过操作把一部分往前挪, 直到达到平均值
+
+```java
+public int minimizeArrayValue(int[] nums) {
+  long res = 0, sum = 0;
+  for (int i = 0; i < nums.length; i++) {
+      sum += nums[i];
+      res = Math.max(res, (long)Math.ceil((double)sum / (i + 1)));
+  }
+  return (int) res;
+}
+```
